@@ -38,9 +38,7 @@ namespace utils
 				return file_path;
 			}
 
-			throw std::runtime_error(
-				"Temporary file was already written, but differs. It can't be overwritten as it's still in use: " +
-				file_path);
+			throw std::runtime_error("Temporary file was already written, but differs. It can't be overwritten as it's still in use: " + file_path);
 		}
 	}
 
