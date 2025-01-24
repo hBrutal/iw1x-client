@@ -55,8 +55,7 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
     const auto* file_name = utils::string::va("minidumps\\cod-mod_%s_%s.dmp", SHORTVERSION, get_current_date());
     constexpr auto file_share = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
-    const auto file_handle = CreateFileA(file_name, GENERIC_WRITE | GENERIC_READ, file_share, nullptr,
-        CREATE_ALWAYS, NULL, nullptr);
+    const auto file_handle = CreateFileA(file_name, GENERIC_WRITE | GENERIC_READ, file_share, nullptr, CREATE_ALWAYS, NULL, nullptr);
 
     if (!MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),
         file_handle, static_cast<MINIDUMP_TYPE>(type),
@@ -197,6 +196,8 @@ void apply_environment()
         {
             std::free(buffer);
         });
+
+    MessageBoxA(nullptr, buffer, "cod-mod", MB_ICONINFORMATION);
 
     SetCurrentDirectoryA(buffer);
     SetDllDirectoryA(buffer);

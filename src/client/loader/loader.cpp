@@ -31,15 +31,14 @@ void loader::set_import_resolver(const std::function<void* (const std::string&, 
 	this->import_resolver_ = resolver;
 }
 
-void loader::load_section(const utils::nt::library& target, const utils::nt::library& source,
-	IMAGE_SECTION_HEADER* section)
+void loader::load_section(const utils::nt::library& target, const utils::nt::library& source, IMAGE_SECTION_HEADER* section)
 {
 	void* target_ptr = target.get_ptr() + section->VirtualAddress;
 	const void* source_ptr = source.get_ptr() + section->PointerToRawData;
 
 	if (PBYTE(target_ptr) >= (target.get_ptr() + BINARY_PAYLOAD_SIZE))
 	{
-		MessageBoxA(nullptr, "Section exceeds the binary payload size", "cod-mod", MB_ICONINFORMATION);
+		//MessageBoxA(nullptr, "Section exceeds the binary payload size", "cod-mod", MB_ICONINFORMATION);
 		throw std::runtime_error("Section exceeds the binary payload size, please increase it!");
 	}
 
@@ -70,8 +69,6 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 	{
 		std::string name = LPSTR(target.get_ptr() + descriptor->Name);
 
-		//MessageBoxA(nullptr, name.c_str(), "cod-mod", MB_ICONINFORMATION);
-
 		auto* name_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->OriginalFirstThunk);
 		auto* address_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->FirstThunk);
 
@@ -82,9 +79,6 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 
 		while (*name_table_entry)
 		{
-			//std::string name_table_entry_string = std::to_string(*name_table_entry);
-			//MessageBoxA(nullptr, name_table_entry_string.c_str(), "cod-mod", MB_ICONINFORMATION);
-
 			FARPROC function = nullptr;
 			std::string function_name;
 

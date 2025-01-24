@@ -1,12 +1,11 @@
 #pragma once
 
-// MP: 0x0B459A00
-#define BINARY_PAYLOAD_SIZE 0x0B500000
+#define BINARY_PAYLOAD_SIZE 0x0A000000
 
-//#pragma warning(push)
-//#pragma warning(disable: 4100)
+#pragma warning(push)
+#pragma warning(disable: 4100)
 //#pragma warning(disable: 4127)
-//#pragma warning(disable: 4244)
+#pragma warning(disable: 4244)
 //#pragma warning(disable: 4458)
 //#pragma warning(disable: 4702)
 //#pragma warning(disable: 4996)
@@ -71,8 +70,8 @@
 #include <asmjit/core/jitruntime.h>
 #include <asmjit/x86/x86assembler.h>
 
-//#pragma warning(pop)
-//#pragma warning(disable: 4100)
+#pragma warning(pop)
+#pragma warning(disable: 4100)
 
 #pragma comment(lib, "Crypt32.lib")
 #pragma comment(lib, "iphlpapi.lib")
