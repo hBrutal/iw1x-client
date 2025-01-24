@@ -76,16 +76,6 @@ namespace game_module
 
 			return file_name_w_hook.invoke<DWORD>(hmodule, filename, size);
 		}
-
-		void hook_module_resolving()
-		{
-			handle_a_hook.create(&GetModuleHandleA, &get_module_handle_a);
-			handle_w_hook.create(&GetModuleHandleW, &get_module_handle_w);
-			handle_ex_w_hook.create(&GetModuleHandleExA, &get_module_handle_ex_a);
-			handle_ex_w_hook.create(&GetModuleHandleExW, &get_module_handle_ex_w);
-			file_name_a_hook.create(&GetModuleFileNameA, &get_module_file_name_a);
-			file_name_w_hook.create(&GetModuleFileNameW, &get_module_file_name_w);
-		}
 	}
 
 	utils::nt::library get_game_module()
@@ -110,9 +100,7 @@ namespace game_module
 
 		void post_load() override
 		{
-
-			//assert(get_host_module() == get_game_module());
-
+			assert(get_host_module() == get_game_module());
 		}
 	};
 }

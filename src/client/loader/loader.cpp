@@ -20,12 +20,8 @@ FARPROC loader::load(const utils::nt::library& library, const std::string& buffe
 	DWORD old_protect;
 	VirtualProtect(library.get_nt_headers(), 0x1000, PAGE_EXECUTE_READWRITE, &old_protect);
 
-	library.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT] = source
-		.get_optional_header()->DataDirectory[
-			IMAGE_DIRECTORY_ENTRY_IMPORT];
-	std::memmove(library.get_nt_headers(), source.get_nt_headers(),
-		sizeof(IMAGE_NT_HEADERS) + source.get_nt_headers()->FileHeader.NumberOfSections * sizeof(
-			IMAGE_SECTION_HEADER));
+	library.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT] = source.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+	std::memmove(library.get_nt_headers(), source.get_nt_headers(), sizeof(IMAGE_NT_HEADERS) + source.get_nt_headers()->FileHeader.NumberOfSections * sizeof(IMAGE_SECTION_HEADER));
 
 	return FARPROC(library.get_ptr() + source.get_relative_entry_point());
 }
@@ -43,6 +39,7 @@ void loader::load_section(const utils::nt::library& target, const utils::nt::lib
 
 	if (PBYTE(target_ptr) >= (target.get_ptr() + BINARY_PAYLOAD_SIZE))
 	{
+		MessageBoxA(nullptr, "Section exceeds the binary payload size", "cod-mod", MB_ICONINFORMATION);
 		throw std::runtime_error("Section exceeds the binary payload size, please increase it!");
 	}
 
@@ -73,6 +70,8 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 	{
 		std::string name = LPSTR(target.get_ptr() + descriptor->Name);
 
+		//MessageBoxA(nullptr, name.c_str(), "cod-mod", MB_ICONINFORMATION);
+
 		auto* name_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->OriginalFirstThunk);
 		auto* address_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->FirstThunk);
 
@@ -83,6 +82,9 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 
 		while (*name_table_entry)
 		{
+			//std::string name_table_entry_string = std::to_string(*name_table_entry);
+			//MessageBoxA(nullptr, name_table_entry_string.c_str(), "cod-mod", MB_ICONINFORMATION);
+
 			FARPROC function = nullptr;
 			std::string function_name;
 
@@ -115,8 +117,8 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 
 			if (!function)
 			{
-				throw std::runtime_error(utils::string::va("Unable to load import '%s' from library '%s'",
-					function_name.data(), name.data()));
+				MessageBoxA(nullptr, "Unable to load import", "cod-mod", MB_ICONINFORMATION);
+				throw std::runtime_error(utils::string::va("Unable to load import '%s' from library '%s'", function_name.data(), name.data()));
 			}
 
 			utils::hook::set(address_table_entry, reinterpret_cast<uintptr_t>(function));

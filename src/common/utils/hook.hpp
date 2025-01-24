@@ -1,6 +1,11 @@
 #pragma once
 
+
+
+
+
 #include "nt.hpp"
+
 
 
 
@@ -98,6 +103,9 @@ namespace utils::hook
 
     void nop(void* place, size_t length);
     void nop(size_t place, size_t length);
+
+
+
 
 
 

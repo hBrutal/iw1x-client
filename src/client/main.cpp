@@ -67,7 +67,7 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
             exception_info->ExceptionRecord->ExceptionCode,
             exception_info->ExceptionRecord->ExceptionAddress);
         //game::show_error(buf);
-        MessageBoxA(nullptr, buf, "Fatal Error", MB_ICONERROR);
+        MessageBoxA(nullptr, buf, "cod-mod", MB_ICONINFORMATION);
     }
 
     CloseHandle(file_handle);
@@ -236,6 +236,7 @@ int main()
             entry_point = load_binary();
             if (!entry_point)
             {
+                MessageBoxA(nullptr, "Unable to load binary into memory", "cod-mod", MB_ICONINFORMATION);
                 throw std::runtime_error("Unable to load binary into memory");
             }
 
@@ -246,7 +247,7 @@ int main()
         catch (std::exception& ex)
         {
             //game::show_error(ex.what());
-            MessageBoxA(nullptr, ex.what(), "Error", MB_ICONERROR);
+            MessageBoxA(nullptr, ex.what(), "cod-mod", MB_ICONINFORMATION);
             return 1;
         }
     }

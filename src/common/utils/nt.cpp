@@ -7,11 +7,6 @@ namespace utils::nt
 		return library(LoadLibraryA(name.data()));
 	}
 
-	library library::load(const std::filesystem::path& path)
-	{
-		return load(path.generic_string());
-	}
-
 	library library::get_by_address(void* address)
 	{
 		HMODULE handle = nullptr;
@@ -91,8 +86,7 @@ namespace utils::nt
 		if (!this->is_valid()) return;
 
 		DWORD protection;
-		VirtualProtect(this->get_ptr(), this->get_optional_header()->SizeOfImage, PAGE_EXECUTE_READWRITE,
-			&protection);
+		VirtualProtect(this->get_ptr(), this->get_optional_header()->SizeOfImage, PAGE_EXECUTE_READWRITE, &protection);
 	}
 
 	size_t library::get_relative_entry_point() const
@@ -173,24 +167,21 @@ namespace utils::nt
 		auto* header = this->get_optional_header();
 		if (!header) return nullptr;
 
-		auto* import_descriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(this->get_ptr() + header->DataDirectory
-			[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+		auto* import_descriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(this->get_ptr() + header->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
 		while (import_descriptor->Name)
 		{
 			if (!_stricmp(reinterpret_cast<char*>(this->get_ptr() + import_descriptor->Name), module_name.data()))
 			{
-				auto* original_thunk_data = reinterpret_cast<PIMAGE_THUNK_DATA>(import_descriptor->
-					OriginalFirstThunk + this->get_ptr());
-				auto* thunk_data = reinterpret_cast<PIMAGE_THUNK_DATA>(import_descriptor->FirstThunk + this->
-					get_ptr());
+				auto* original_thunk_data = reinterpret_cast<PIMAGE_THUNK_DATA>(import_descriptor->OriginalFirstThunk + this->get_ptr());
+				auto* thunk_data = reinterpret_cast<PIMAGE_THUNK_DATA>(import_descriptor->FirstThunk + this->get_ptr());
 
 				while (original_thunk_data->u1.AddressOfData)
 				{
-					if (thunk_data->u1.Function == reinterpret_cast<uint64_t>(target_function))
+					/*if (thunk_data->u1.Function == reinterpret_cast<uint64_t>(target_function))
 					{
 						return reinterpret_cast<void**>(&thunk_data->u1.Function);
-					}
+					}*/
 
 					const size_t ordinal_number = original_thunk_data->u1.AddressOfData & 0xFFFFFFF;
 
@@ -216,17 +207,6 @@ namespace utils::nt
 		return nullptr;
 	}
 
-	bool is_wine()
-	{
-		static const auto has_wine_export = []() -> bool
-			{
-				const library ntdll("ntdll.dll");
-				return ntdll.get_proc<void*>("wine_get_version");
-			}();
-
-		return has_wine_export;
-	}
-
 	void raise_hard_exception()
 	{
 		int data = false;
@@ -244,28 +224,6 @@ namespace utils::nt
 		if (!handle) return {};
 
 		return std::string(LPSTR(LockResource(handle)), SizeofResource(nullptr, res));
-	}
-
-	void relaunch_self()
-	{
-		const library self;
-
-		STARTUPINFOA startup_info;
-		PROCESS_INFORMATION process_info;
-
-		ZeroMemory(&startup_info, sizeof(startup_info));
-		ZeroMemory(&process_info, sizeof(process_info));
-		startup_info.cb = sizeof(startup_info);
-
-		char current_dir[MAX_PATH];
-		GetCurrentDirectoryA(sizeof(current_dir), current_dir);
-		auto* const command_line = GetCommandLineA();
-
-		CreateProcessA(self.get_path().data(), command_line, nullptr, nullptr, false, NULL, nullptr, current_dir,
-			&startup_info, &process_info);
-
-		if (process_info.hThread && process_info.hThread != INVALID_HANDLE_VALUE) CloseHandle(process_info.hThread);
-		if (process_info.hProcess && process_info.hProcess != INVALID_HANDLE_VALUE) CloseHandle(process_info.hProcess);
 	}
 
 	void terminate(const uint32_t code)

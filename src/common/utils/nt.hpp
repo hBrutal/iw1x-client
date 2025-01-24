@@ -22,7 +22,6 @@ namespace utils::nt
 	{
 	public:
 		static library load(const std::string& name);
-		static library load(const std::filesystem::path& path);
 		static library get_by_address(void* address);
 
 		library();
@@ -110,11 +109,8 @@ namespace utils::nt
 		HMODULE module_;
 	};
 
-	bool is_wine();
-
 	__declspec(noreturn) void raise_hard_exception();
 	std::string load_resource(int id);
 
-	void relaunch_self();
 	__declspec(noreturn) void terminate(uint32_t code = 0);
 }

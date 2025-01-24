@@ -2,10 +2,6 @@
 
 #include "structs.hpp"
 
-#define SELECT_VALUE(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
-
-#define SERVER_CD_KEY "iw6-mod-CD-Key"
-
 namespace game
 {
 	namespace environment
