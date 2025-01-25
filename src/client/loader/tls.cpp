@@ -4,8 +4,6 @@
 #include <utils/nt.hpp>
 #include <utils/binary_resource.hpp>
 
-#include <resource.hpp>
-
 namespace tls
 {
 	namespace

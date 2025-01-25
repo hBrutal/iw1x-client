@@ -49,7 +49,8 @@ namespace utils
 
 		if (this->resource_.empty())
 		{
-			throw std::runtime_error("Unable to load resource: " + std::to_string(id));
+			if (id != 309) // TLS_DLL
+				throw std::runtime_error("Unable to load resource: " + std::to_string(id));
 		}
 	}
 
