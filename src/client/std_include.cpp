@@ -9,13 +9,13 @@
 #pragma bss_seg(".payload")
 char payload_data[BINARY_PAYLOAD_SIZE];
 
-extern "C"
+/*extern "C"
 {
 	__declspec(dllexport) DWORD NvOptimusEnablement = 1;
 	__declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 1;
-};
+};*/
 
-extern "C"
+/*extern "C"
 {
 	int s_read_arc4random(void*, size_t)
 	{
@@ -31,4 +31,4 @@ extern "C"
 	{
 		return -1;
 	}
-}
+}*/

@@ -24,7 +24,6 @@ namespace tls
 		already_allocated = true;
 
 		const auto dll_path = tls_dll_file.get_extracted_file();
-		MessageBoxA(nullptr, dll_path.c_str(), "cod-mod", MB_ICONINFORMATION);
 		const auto tls_dll = utils::nt::library::load(dll_path);
 		if (!tls_dll)
 		{

@@ -104,6 +104,15 @@ FARPROC load_binary()
 
     loader.set_import_resolver([self](const std::string& library, const std::string& function) -> void*
         {
+
+            /*if (library == "mss32.dll")
+            {
+                MessageBoxA(NULL, function.c_str(), "cod-mod", MB_OK);
+            }*/
+
+            
+
+
             if (function == "ExitProcess")
             {
                 return exit_hook;
@@ -197,8 +206,6 @@ void apply_environment()
             std::free(buffer);
         });
 
-    MessageBoxA(nullptr, buffer, "cod-mod", MB_ICONINFORMATION);
-
     SetCurrentDirectoryA(buffer);
     SetDllDirectoryA(buffer);
 }
@@ -209,11 +216,11 @@ int main()
     SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
     FARPROC entry_point;
-    enable_dpi_awareness();
+    //enable_dpi_awareness();
 
     // This requires admin privilege, but I suppose many
     // people will start with admin rights if it crashes.
-    limit_parallel_dll_loading();
+    //limit_parallel_dll_loading();
 
     std::srand(static_cast<std::uint32_t>(time(nullptr)) ^ ~(GetTickCount() * GetCurrentProcessId()));
 
@@ -229,7 +236,12 @@ int main()
 
         try
         {
-            apply_environment();
+            //apply_environment();
+
+            /*char currentDirectory[MAX_PATH];
+            GetCurrentDirectoryA(MAX_PATH, currentDirectory);
+            MessageBoxA(NULL, currentDirectory, "cod-mod", MB_OK);*/
+
             remove_crash_file();
 
             if (!component_loader::post_start()) return 0;

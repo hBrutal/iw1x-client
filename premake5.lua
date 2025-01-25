@@ -270,27 +270,13 @@ resincludedirs {"$(ProjectDir)src"}
 
 dependencies.imports()
 
-project "runner"
-kind "WindowedApp"
-language "C++"
-
-files {"./src/runner/**.rc", "./src/runner/**.hpp", "./src/runner/**.cpp"}
-
-includedirs {"./src/runner", "./src/common", "%{prj.location}/src"}
-
-resincludedirs {"$(ProjectDir)src"}
-
-links {"common"}
-
-dependencies.imports()
-
 project "client"
 kind "WindowedApp"
 language "C++"
 
 targetname "cod-mod"
 
-dependson {"tlsdll", "runner"}
+dependson {"tlsdll"}
 
 pchheader "std_include.hpp"
 pchsource "src/client/std_include.cpp"

@@ -217,6 +217,9 @@ namespace utils::nt
 
 	std::string load_resource(const int id)
 	{
+		/*std::string string_from_int = std::to_string(id);
+		MessageBoxA(NULL, string_from_int.c_str(), "cod-mod", MB_OK);*/
+
 		auto* const res = FindResource(library(), MAKEINTRESOURCE(id), RT_RCDATA);
 		if (!res) return {};
 
