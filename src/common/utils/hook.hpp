@@ -96,12 +96,18 @@ namespace utils::hook
     void nop(void* place, size_t length);
     void nop(size_t place, size_t length);
 
+    bool is_relatively_far(const void* pointer, const void* data, int offset = 5);
 
+    void call(void* pointer, void* data);
+    void call(size_t pointer, void* data);
+    void call(size_t pointer, size_t data);
 
+    void jump(void* pointer, void* data, bool use_far = false);
+    void jump(size_t pointer, void* data, bool use_far = false);
+    void jump(size_t pointer, size_t data, bool use_far = false);
 
-
-
-
+    void inject(void* pointer, const void* data);
+    void inject(size_t pointer, const void* data);
 
     template <typename T>
     static void set(void* place, T value)
