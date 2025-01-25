@@ -228,10 +228,6 @@ int main()
         {
             //apply_environment();
 
-            /*char currentDirectory[MAX_PATH];
-            GetCurrentDirectoryA(MAX_PATH, currentDirectory);
-            MessageBoxA(NULL, currentDirectory, "cod-mod", MB_OK);*/
-
             remove_crash_file();
 
             if (!component_loader::post_start()) return 0;
@@ -239,7 +235,6 @@ int main()
             entry_point = load_binary();
             if (!entry_point)
             {
-                MessageBoxA(nullptr, "Unable to load binary into memory", "cod-mod", MB_ICONINFORMATION);
                 throw std::runtime_error("Unable to load binary into memory");
             }
 

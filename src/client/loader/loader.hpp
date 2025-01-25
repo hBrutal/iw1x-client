@@ -12,5 +12,4 @@ private:
 	static void load_section(const utils::nt::library& target, const utils::nt::library& source, IMAGE_SECTION_HEADER* section);
 	void load_sections(const utils::nt::library& target, const utils::nt::library& source) const;
 	void load_imports(const utils::nt::library& target, const utils::nt::library& source) const;
-	void load_tls(const utils::nt::library& target, const utils::nt::library& source) const;
 };

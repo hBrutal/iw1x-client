@@ -276,7 +276,7 @@ language "C++"
 
 targetname "cod-mod"
 
-dependson {"tlsdll"}
+dependson { }
 
 pchheader "std_include.hpp"
 pchsource "src/client/std_include.cpp"
@@ -298,20 +298,6 @@ if _OPTIONS["copy-to"] then
 		"copy /y \"$(TargetDir)*.exe\" \"" .. _OPTIONS["copy-to"] .. "\""
 	}
 end
-
-dependencies.imports()
-
-project "tlsdll"
-kind "SharedLib"
-language "C++"
-
-files {"./src/tlsdll/**.rc", "./src/tlsdll/**.hpp", "./src/tlsdll/**.cpp", "./src/tlsdll/resources/**.*"}
-
-includedirs {"./src/tlsdll", "%{prj.location}/src"}
-
-links {"common"}
-
-resincludedirs {"$(ProjectDir)src"}
 
 dependencies.imports()
 

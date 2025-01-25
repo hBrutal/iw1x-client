@@ -37,6 +37,4 @@
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
 
-#include "resource.hpp"
-
 using namespace std::literals;
