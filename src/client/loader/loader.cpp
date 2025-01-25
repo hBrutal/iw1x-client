@@ -42,10 +42,18 @@ void loader::load_section(const utils::nt::library& target, const utils::nt::lib
 	
 	if (section->SizeOfRawData > 0)
 	{
+#if 0
 		std::memmove(target_ptr, source_ptr, section->SizeOfRawData);
 
 		DWORD old_protect;
 		VirtualProtect(target_ptr, section->Misc.VirtualSize, PAGE_EXECUTE_READWRITE, &old_protect);
+#else
+		const auto size_of_data = std::min(section->SizeOfRawData, section->Misc.VirtualSize);
+		std::memmove(target_ptr, source_ptr, size_of_data);
+
+		DWORD old_protect;
+		VirtualProtect(target_ptr, size_of_data, PAGE_EXECUTE_READWRITE, &old_protect);
+#endif
 	}
 }
 
@@ -66,6 +74,11 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 	while (descriptor->Name)
 	{
 		std::string name = LPSTR(target.get_ptr() + descriptor->Name);
+
+		/*std::ostringstream oss;
+		oss << "######## " << "name: " << name << "\n";
+		std::string result = oss.str();
+		OutputDebugString(result.c_str());*/
 
 		auto* name_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->OriginalFirstThunk);
 		auto* address_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->FirstThunk);

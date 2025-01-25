@@ -103,15 +103,6 @@ FARPROC load_binary()
 
     loader.set_import_resolver([self](const std::string& library, const std::string& function) -> void*
         {
-
-            /*if (library == "mss32.dll")
-            {
-                MessageBoxA(NULL, function.c_str(), "cod-mod", MB_OK);
-            }*/
-
-            
-
-
             if (function == "ExitProcess")
             {
                 return exit_hook;
