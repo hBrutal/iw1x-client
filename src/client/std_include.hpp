@@ -28,30 +28,14 @@
 #include <gsl/gsl>
 #include <MinHook.h>
 
-
-
-
 #include <asmjit/core/jitruntime.h>
 #include <asmjit/x86/x86assembler.h>
 
 #pragma warning(pop)
 #pragma warning(disable: 4100)
 
-
-
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
-
-
-
-
-
-
-
-
-
-
-
 
 #include "resource.hpp"
 
