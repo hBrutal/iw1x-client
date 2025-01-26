@@ -1,6 +1,8 @@
 #pragma once
 #include <utils/nt.hpp>
 
+#include "launcher/launcher.hpp"
+
 class loader final
 {
 public:

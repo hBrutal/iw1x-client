@@ -1,8 +1,10 @@
 #include <std_include.hpp>
-
+#include "launcher/launcher.hpp"
 #include "loader/loader.hpp"
 #include "loader/component_loader.hpp"
+#include "game/game.hpp"
 
+#include <utils/flags.hpp>
 #include <utils/io.hpp>
 #include <utils/string.hpp>
 
@@ -96,7 +98,27 @@ FARPROC WINAPI get_proc_address(const HMODULE hModule, const LPCSTR lpProcName)
     return GetProcAddress(hModule, lpProcName);
 }
 
-FARPROC load_binary()
+launcher::mode detect_mode_from_arguments()
+{
+    if (utils::flags::has_flag("dedicated"))
+    {
+        return launcher::mode::server;
+    }
+
+    if (utils::flags::has_flag("multiplayer"))
+    {
+        return launcher::mode::multiplayer;
+    }
+
+    if (utils::flags::has_flag("singleplayer"))
+    {
+        return launcher::mode::singleplayer;
+    }
+
+    return launcher::mode::none;
+}
+
+FARPROC load_binary(const launcher::mode mode)
 {
     loader loader;
     utils::nt::library self;
@@ -122,7 +144,19 @@ FARPROC load_binary()
         });
 
     std::string binary;
-    binary = "CoDMP.exe";
+    switch (mode)
+    {
+    case launcher::mode::server:
+    case launcher::mode::multiplayer:
+        binary = "CoDMP.exe";
+        break;
+    case launcher::mode::singleplayer:
+        binary = "CoDSP.exe";
+        break;
+    case launcher::mode::none:
+    default:
+        throw std::runtime_error("Invalid game mode!");
+    }
 
     std::string data;
     if (!utils::io::read_file(binary, &data))
@@ -142,6 +176,7 @@ void remove_crash_file()
 
     utils::io::remove_file("__" + name);
     utils::io::remove_file("__codmp");
+    utils::io::remove_file("__codsp");
 }
 
 void limit_parallel_dll_loading()
@@ -232,7 +267,17 @@ int main()
 
             if (!component_loader::post_start()) return 0;
 
-            entry_point = load_binary();
+            auto mode = detect_mode_from_arguments();
+            if (mode == launcher::mode::none)
+            {
+                const launcher launcher;
+                mode = launcher.run();
+                if (mode == launcher::mode::none) return 0;
+            }
+
+            game::environment::set_mode(mode);
+
+            entry_point = load_binary(mode);
             if (!entry_point)
             {
                 throw std::runtime_error("Unable to load binary into memory");

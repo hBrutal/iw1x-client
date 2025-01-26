@@ -1,0 +1,11 @@
+#pragma code_page(65001)
+
+#define APSTUDIO_READONLY_SYMBOLS
+#include "windows.h"
+#include "version.h"
+#include "resource.hpp"
+#undef APSTUDIO_READONLY_SYMBOLS
+
+ID_ICON               ICON   "resources/icon.ico"
+MENU_MAIN             RCDATA "resources/main.html"
+ICON_IMAGE            RCDATA "resources/icon.png"
