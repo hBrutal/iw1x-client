@@ -143,27 +143,22 @@ FARPROC load_binary(const launcher::mode mode)
             return component_loader::load_import(library, function);
         });
 
-    std::string binary;
-    switch (mode)
+    // Check if the CoD file is named mohaa
+    char path[MAX_PATH];
+    GetModuleFileNameA(NULL, path, sizeof(path));
+    std::string filePath(path);
+    size_t pos = filePath.find_last_of('\\');
+    if (pos != std::string::npos)
     {
-    case launcher::mode::server:
-    case launcher::mode::multiplayer:
-        binary = "CoDMP.exe";
-        break;
-    case launcher::mode::singleplayer:
-        binary = "CoDSP.exe";
-        break;
-    case launcher::mode::none:
-    default:
-        throw std::runtime_error("Invalid game mode!");
+        filePath.replace(pos + 1, std::string::npos, "mohaa.exe");
+        if (utils::io::file_exists(filePath))
+            game::environment::set_mohaa();
     }
 
+    auto binary = game::environment::get_binary();
     std::string data;
     if (!utils::io::read_file(binary, &data))
-    {
-        throw std::runtime_error(
-            "Failed to read game binary! Please select the correct path in the launcher settings.");
-    }
+        throw std::runtime_error("Failed to read game binary");
 
     return loader.load(self, data);
 }
@@ -177,6 +172,7 @@ void remove_crash_file()
     utils::io::remove_file("__" + name);
     utils::io::remove_file("__codmp");
     utils::io::remove_file("__codsp");
+    utils::io::remove_file("__mohaa");
 }
 
 void limit_parallel_dll_loading()
@@ -241,7 +237,7 @@ int main()
     SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
     FARPROC entry_point;
-    //enable_dpi_awareness();
+    enable_dpi_awareness();
 
     // This requires admin privilege, but I suppose many
     // people will start with admin rights if it crashes.

@@ -16,6 +16,8 @@ namespace game
 	{
 		launcher::mode mode = launcher::mode::none;
 
+		bool mohaa;
+
 		launcher::mode get_mode()
 		{
 			if (mode == launcher::mode::none)
@@ -24,6 +26,29 @@ namespace game
 			}
 
 			return mode;
+		}
+
+		std::string get_binary()
+		{
+			switch (mode)
+			{
+			case launcher::mode::server:
+			case launcher::mode::multiplayer:
+				if(is_mohaa())
+					return "mohaa.exe";
+				else
+					return "CoDMP.exe";
+				break;
+			case launcher::mode::singleplayer:
+				if (is_mohaa())
+					return "mohaa.exe";
+				else
+					return "CoDSP.exe";
+				break;
+			case launcher::mode::none:
+			default:
+				throw std::runtime_error("Invalid game mode");
+			}
 		}
 
 		bool is_dedi()
@@ -41,9 +66,19 @@ namespace game
 			return get_mode() == launcher::mode::singleplayer;
 		}
 
+		bool is_mohaa()
+		{
+			return mohaa;
+		}
+
 		void set_mode(const launcher::mode _mode)
 		{
 			mode = _mode;
+		}
+
+		void set_mohaa()
+		{
+			mohaa = true;
 		}
 	}
 

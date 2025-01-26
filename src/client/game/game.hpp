@@ -9,12 +9,15 @@ namespace game
 	namespace environment
 	{
 		launcher::mode get_mode();
+		std::string get_binary();
 
 		bool is_mp();
 		bool is_sp();
 		bool is_dedi();
+		bool is_mohaa();
 
 		void set_mode(launcher::mode mode);
+		void set_mohaa();
 	}
 
 	template <typename T>
