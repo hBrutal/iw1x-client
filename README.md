@@ -1,7 +1,11 @@
-making a c1cx replacement, using the codebase of iw4x-sp and iw6-mod, so instead of using dll injection, it bootstraps
+> [!NOTE]
+> Replacing [c1cx](https://github.com/cod1dev/c1cx), using the codebase of modern CoD mods, bootstrapping the original client .exe instead of using DLL injection.
 
-The goal is to no longer trigger Windows antivirus, and obtain a more modern base which would make it easier to take elements from client extensions of newer cod versions
+The goal is to no longer trigger Windows antivirus, and obtain a source code closer to modern CoD mods, making it easier to take elements from them.
 
-i upload before ready to use in case some people would like to see/participate
+> [!IMPORTANT]
+> You might need to rename `cod-mod.exe` to `mohaa.exe` for the game to run.
 
-currently i need to rename cod-mod.exe to mohaa.exe for the game to run on both my intel hd graphics and amd pc
+#### References
+- [AlterWare](https://alterware.dev/)
+- [Aurora](https://auroramod.dev/)
