@@ -17,7 +17,7 @@ window::window()
 	this->wc_.lpfnWndProc = static_processor;
 	this->wc_.hInstance = GetModuleHandle(nullptr);
 	this->wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	this->wc_.hIcon = LoadIcon(this->wc_.hInstance, MAKEINTRESOURCE(102));
+	this->wc_.hIcon = LoadIcon(this->wc_.hInstance, MAKEINTRESOURCE(ID_ICON));
 	this->wc_.hIconSm = this->wc_.hIcon;
 	this->wc_.hbrBackground = HBRUSH(COLOR_WINDOW);
 	this->wc_.lpszClassName = this->classname_.data();

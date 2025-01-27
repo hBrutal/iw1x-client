@@ -1,14 +1,4 @@
-#define APSTUDIO_READONLY_SYMBOLS
-#include "windows.h"
-#include "version.h"
 #include "resource.hpp"
-#undef APSTUDIO_READONLY_SYMBOLS
 
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-STRINGTABLE
-BEGIN
-    ID_STRING1    L"Call of Duty"
-END
-
-ID_ICON			ICON   "resources/icon.ico"
-MENU_MAIN		RCDATA "resources/main.html"
+ID_ICON		ICON	"resources/icon.ico"
+MENU_MAIN	RCDATA	"resources/main.html"
