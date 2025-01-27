@@ -1,15 +1,29 @@
 #pragma once
 
+
+
+
 #define WEAK __declspec(selectany)
+
+
 
 namespace game
 {
+	
+
+
+
+
 	/***************************************************************
 	 * Functions
 	 **************************************************************/
-
-	//WEAK symbol<void(unsigned int id)> AddRefToObject{0x1403D7A10, 0x1404326D0};
 	
+	//WEAK symbol<Font_s* (const char* font)> trap_R_RegisterFont{ 0x0, CGAME_OFF(0x301ad770) };
+	//WEAK symbol<void(const char* message)> CG_ServerCommand{ 0x0, 0x3002e0d0 };
+	
+
+
+
 
 	/***************************************************************
 	 * Variables
@@ -18,6 +32,9 @@ namespace game
 	//WEAK symbol<int> keyCatchers{0x1417CF6E0, 0x1419E1ADC};
 
 	
+
+
+
 
 	/*namespace sp
 	{

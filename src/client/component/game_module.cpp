@@ -5,14 +5,33 @@
 
 #include <utils/hook.hpp>
 
+#define cgame_mp_offset(relative) (cgame_mp + (relative - 0x30000000))
+
 namespace game_module
 {
-	utils::hook::detour nt_GetModuleFileName_hook;
+	DWORD cgame_mp;
+	utils::hook::detour CG_ServerCommand_hook;
 
-	utils::nt::library get_game_module()
+	void CG_ServerCommand_stub()
 	{
-		static utils::nt::library game{ HMODULE(0x400000) };
-		return game;
+		//MessageBoxA(nullptr, "CG_ServerCommand_stub", "cod-mod", MB_ICONINFORMATION);
+
+
+		CG_ServerCommand_hook.invoke();
+	}
+
+	void hook_dll_cg_mp()
+	{
+		CG_ServerCommand_hook.create(cgame_mp_offset(0x3002e0d0), CG_ServerCommand_stub);
+	}
+	
+	utils::hook::detour nt_GetModuleFileName_hook;
+	utils::hook::detour nt_LoadLibrary_hook;
+
+	utils::nt::library get_client_module()
+	{
+		static utils::nt::library client{ HMODULE(0x400000) };
+		return client;
 	}
 
 	utils::nt::library get_host_module()
@@ -20,8 +39,8 @@ namespace game_module
 		static utils::nt::library host{};
 		return host;
 	}
-	
-	// Make the GPU driver enable the proper profile, preventing buffer overrun when CoD calls glGetString(GL_EXTENSIONS)
+
+	// Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
 	DWORD WINAPI nt_GetModuleFileName_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
 		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileName_hook.get_original());
@@ -40,6 +59,24 @@ namespace game_module
 		}
 		return ret;
 	}
+
+	HMODULE WINAPI nt_LoadLibrary_stub(LPCSTR lpFileName)
+	{
+		auto* orig = static_cast<decltype(LoadLibraryA)*>(nt_LoadLibrary_hook.get_original());
+		auto ret = orig(lpFileName);
+		DWORD hModule = (DWORD)GetModuleHandleA(lpFileName);
+
+		if (lpFileName != NULL)
+		{
+			if (strstr(lpFileName, "cgame_mp_x86"))
+			{
+				cgame_mp = hModule;
+				hook_dll_cg_mp();
+			}
+		}
+
+		return ret;
+	}
 	
 	class component final : public component_interface
 	{
@@ -51,10 +88,12 @@ namespace game_module
 
 		void post_load() override
 		{
-			assert(get_host_module() == get_game_module());
+			assert(get_host_module() == get_client_module());
 			
 			const utils::nt::library kernel32("kernel32.dll");
+
 			nt_GetModuleFileName_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileName_stub);
+			nt_LoadLibrary_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibrary_stub);
 		}
 	};
 }

@@ -144,21 +144,9 @@ namespace utils::hook
     {
         nop(reinterpret_cast<void*>(place), length);
     }
-
-    bool is_relatively_far(const void* pointer, const void* data, const int offset)
-    {
-        const int64_t diff = size_t(data) - (size_t(pointer) + offset);
-        const auto small_diff = int32_t(diff);
-        return diff != int64_t(small_diff);
-    }
     
     void call(void* pointer, void* data)
     {
-        if (is_relatively_far(pointer, data))
-        {
-            throw std::runtime_error("Too far away to create 32bit relative branch");
-        }
-
         auto* patch_pointer = PBYTE(pointer);
         set<uint8_t>(patch_pointer, 0xE8);
         set<int32_t>(patch_pointer + 1, int32_t(size_t(data) - (size_t(pointer) + 5)));
@@ -176,11 +164,6 @@ namespace utils::hook
     
     void jump(void* pointer, void* data, const bool use_far)
     {
-        if (!use_far && is_relatively_far(pointer, data))
-        {
-            throw std::runtime_error("Too far away to create 32bit relative branch");
-        }
-
         auto* patch_pointer = PBYTE(pointer);
         set<uint8_t>(patch_pointer, 0xE9);
         set<int32_t>(patch_pointer + 1, int32_t(size_t(data) - (size_t(pointer) + 5)));
@@ -198,11 +181,6 @@ namespace utils::hook
 
     void inject(void* pointer, const void* data)
     {
-        if (is_relatively_far(pointer, data, 4))
-        {
-            throw std::runtime_error("Too far away to create 32bit relative branch");
-        }
-
         set<int32_t>(pointer, int32_t(size_t(data) - (size_t(pointer) + 4)));
     }
 

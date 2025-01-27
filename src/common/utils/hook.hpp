@@ -96,8 +96,6 @@ namespace utils::hook
     void nop(void* place, size_t length);
     void nop(size_t place, size_t length);
 
-    bool is_relatively_far(const void* pointer, const void* data, int offset = 5);
-
     void call(void* pointer, void* data);
     void call(size_t pointer, void* data);
     void call(size_t pointer, size_t data);
