@@ -56,6 +56,8 @@ namespace game_module
 			path.replace_filename(binary);
 			std::string pathStr = path.string();
 			strncpy(lpFilename, pathStr.c_str(), nSize - 1);
+
+			MessageBoxA(nullptr, "replaced", "cod-mod", MB_ICONINFORMATION);
 		}
 
 		return ret;
