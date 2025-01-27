@@ -45,7 +45,7 @@ void loader::load_section(const utils::nt::library& target, const utils::nt::lib
 
 		DWORD old_protect;
 		VirtualProtect(target_ptr, section->Misc.VirtualSize, PAGE_EXECUTE_READWRITE, &old_protect);
-#else
+#else	// Recommended by wroyca
 		const auto size_of_data = std::min(section->SizeOfRawData, section->Misc.VirtualSize);
 		std::memmove(target_ptr, source_ptr, size_of_data);
 

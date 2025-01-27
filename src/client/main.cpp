@@ -146,14 +146,10 @@ FARPROC load_binary(const launcher::mode mode)
     // Check if the CoD file is named mohaa
     char path[MAX_PATH];
     GetModuleFileNameA(NULL, path, sizeof(path));
-    std::string filePath(path);
-    size_t pos = filePath.find_last_of('\\');
-    if (pos != std::string::npos)
-    {
-        filePath.replace(pos + 1, std::string::npos, "mohaa.exe");
-        if (utils::io::file_exists(filePath))
-            game::environment::set_mohaa();
-    }
+    std::filesystem::path pathFs = path;
+    pathFs.replace_filename("mohaa.exe");
+    if (utils::io::file_exists(pathFs.string()))
+        game::environment::set_mohaa();
 
     auto binary = game::environment::get_binary();
     std::string data;
@@ -204,13 +200,9 @@ void limit_parallel_dll_loading()
 void enable_dpi_awareness()
 {
     const utils::nt::library user32{ "user32.dll" };
-    const auto set_dpi = user32
-        ? user32.get_proc<BOOL(WINAPI*)(DPI_AWARENESS_CONTEXT)>("SetProcessDpiAwarenessContext")
-        : nullptr;
+    const auto set_dpi = user32 ? user32.get_proc<BOOL(WINAPI*)(DPI_AWARENESS_CONTEXT)>("SetProcessDpiAwarenessContext") : nullptr;
     if (set_dpi)
-    {
         set_dpi(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    }
 }
 
 void apply_environment()
@@ -258,7 +250,6 @@ int main()
         try
         {
             //apply_environment();
-
             remove_crash_file();
 
             if (!component_loader::post_start()) return 0;
@@ -274,11 +265,8 @@ int main()
             game::environment::set_mode(mode);
 
             entry_point = load_binary(mode);
-            if (!entry_point)
-            {
-                throw std::runtime_error("Unable to load binary into memory");
-            }
 
+            if (!entry_point) throw std::runtime_error("Unable to load binary into memory");
             if (!component_loader::post_load()) return 0;
 
             premature_shutdown = false;

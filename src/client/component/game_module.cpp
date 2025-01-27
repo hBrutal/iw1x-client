@@ -25,9 +25,9 @@ namespace game_module
 		CG_ServerCommand_hook.create(cgame_mp_offset(0x3002e0d0), CG_ServerCommand_stub);
 	}
 	
-	utils::hook::detour nt_GetModuleFileName_hook;
-	utils::hook::detour nt_LoadLibrary_hook;
-
+	utils::hook::detour nt_GetModuleFileNameA_hook;
+	utils::hook::detour nt_LoadLibraryA_hook;
+	
 	utils::nt::library get_client_module()
 	{
 		static utils::nt::library client{ HMODULE(0x400000) };
@@ -40,10 +40,15 @@ namespace game_module
 		return host;
 	}
 
+	/*
+	* Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
+	* Doesn't work for Nvidia driver
+	*/
+
 	// Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
-	DWORD WINAPI nt_GetModuleFileName_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
+	DWORD WINAPI nt_GetModuleFileNameA_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
-		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileName_hook.get_original());
+		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileNameA_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 
 		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
@@ -53,14 +58,13 @@ namespace game_module
 			path.replace_filename(binary);
 			std::string pathStr = path.string();
 			strncpy(lpFilename, pathStr.c_str(), nSize - 1);
-			lpFilename[nSize - 1] = '\0';
 		}
 		return ret;
 	}
 
-	HMODULE WINAPI nt_LoadLibrary_stub(LPCSTR lpLibFileName)
+	HMODULE WINAPI nt_LoadLibraryA_stub(LPCSTR lpLibFileName)
 	{
-		auto* orig = static_cast<decltype(LoadLibraryA)*>(nt_LoadLibrary_hook.get_original());
+		auto* orig = static_cast<decltype(LoadLibraryA)*>(nt_LoadLibraryA_hook.get_original());
 		auto ret = orig(lpLibFileName);
 		auto hModule = (DWORD)GetModuleHandleA(lpLibFileName);
 
@@ -92,8 +96,8 @@ namespace game_module
 			
 			const utils::nt::library kernel32("kernel32.dll");
 
-			nt_GetModuleFileName_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileName_stub);
-			nt_LoadLibrary_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibrary_stub);
+			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
+			nt_LoadLibraryA_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibraryA_stub);
 		}
 	};
 }
