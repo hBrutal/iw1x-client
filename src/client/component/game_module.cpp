@@ -46,15 +46,11 @@ namespace game_module
 	*/
 	DWORD WINAPI nt_GetModuleFileNameA_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
-		//MessageBoxA(nullptr, "nt_GetModuleFileNameA_stub", "cod-mod", MB_ICONINFORMATION);
-		
 		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileNameA_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 		
 		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
 		{
-			//MessageBoxA(nullptr, "replace_filename", "cod-mod", MB_ICONINFORMATION);
-
 			std::filesystem::path path = lpFilename;
 			auto binary = game::environment::get_binary();
 			path.replace_filename(binary);
@@ -80,11 +76,6 @@ namespace game_module
 				cgame_mp = hModule;
 				hook_dll_cg_mp();
 			}
-
-			/*if (!strcmp(fileName, "psapi.dll"))
-			{
-				MessageBoxA(nullptr, "psapi.dll", "cod-mod", MB_ICONINFORMATION);
-			}*/
 		}
 
 		return ret;
@@ -95,37 +86,40 @@ namespace game_module
 
 
 
-	/*utils::hook::detour nt_GetModuleFileNameW_hook;
-	DWORD WINAPI nt_GetModuleFileNameW_stub(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
-	{
-		//MessageBoxA(nullptr, "nt_GetModuleFileNameW_stub", "cod-mod", MB_ICONINFORMATION);
-		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileNameW_hook.get_original());
-		auto ret = orig(hModule, lpFilename, nSize);
 
-		if (!wcscmp(PathFindFileNameW(lpFilename), L"cod-mod.exe"))
+
+
+
+	utils::hook::detour nt_Test_hook;
+	LPSTR WINAPI nt_Test_stub()
+	{
+		auto* orig = static_cast<decltype(GetCommandLineA)*>(nt_Test_hook.get_original());
+		auto ret = orig();
+
+		//MessageBoxA(nullptr, ret, "cod-mod", MB_ICONINFORMATION);
+		
+		std::string pathStr = ret;
+		pathStr.erase(pathStr.begin());
+		pathStr.erase(pathStr.size() - 2);
+		
+		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
 		{
-			std::filesystem::path path = lpFilename;
+			std::filesystem::path pathFs = pathStr;
+			
 			auto binary = game::environment::get_binary();
-			path.replace_filename(binary);
-			std::string pathStr = path.string();
-			std::wstring pathWstr(pathStr.begin(), pathStr.end());
-			wcsncpy(lpFilename, pathWstr.c_str(), nSize - 1);
-			//MessageBoxW(nullptr, lpFilename, L"cod-mod", MB_ICONINFORMATION);
+			pathFs.replace_filename(binary);
+			pathStr = pathFs.string();
+			
+			pathStr.insert(pathStr.begin(), '\"');
+			pathStr.insert(pathStr.end(), '\"');
+			
+			strncpy(ret, pathStr.c_str(), strlen(ret) - 1);
+
+			//MessageBoxA(nullptr, ret, "cod-mod", MB_ICONINFORMATION);
 		}
 
 		return ret;
-	}*/
-
-
-
-	/*utils::hook::detour nt_Test_hook;
-	DWORD WINAPI nt_Test_stub(HANDLE hProcess, LPVOID lpv, LPSTR lpImageFileName, DWORD nSize)
-	{
-		MessageBoxA(nullptr, "nt_Test_stub", "cod-mod", MB_ICONINFORMATION);
-		auto* orig = static_cast<decltype(GetMappedFileNameA)*>(nt_Test_hook.get_original());
-		auto ret = orig(hProcess, lpv, lpImageFileName, nSize);
-		return ret;
-	}*/
+	}
 
 
 
@@ -153,9 +147,9 @@ namespace game_module
 
 
 
-			//nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
-			//const utils::nt::library psapi("psapi.dll");
-			//nt_Test_hook.create(psapi.get_proc<DWORD(WINAPI*)(HANDLE, LPVOID, LPSTR, DWORD)>("GetMappedFileNameA"), nt_Test_stub);
+			nt_Test_hook.create(kernel32.get_proc<LPSTR(WINAPI*)()>("GetCommandLineA"), nt_Test_stub);
+
+
 
 
 		}
