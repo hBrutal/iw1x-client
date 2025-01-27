@@ -55,6 +55,11 @@
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
 
+
+//#pragma comment(lib, "psapi.lib")
+
+
+
 #include "resource.hpp"
 
 using namespace std::literals;

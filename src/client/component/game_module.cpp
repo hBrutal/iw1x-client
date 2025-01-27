@@ -44,18 +44,16 @@ namespace game_module
 	* Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
 	* Doesn't work for Nvidia driver
 	*/
-
-	// Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
 	DWORD WINAPI nt_GetModuleFileNameA_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
-		MessageBoxA(nullptr, "nt_GetModuleFileNameA_stub", "cod-mod", MB_ICONINFORMATION);
-
+		//MessageBoxA(nullptr, "nt_GetModuleFileNameA_stub", "cod-mod", MB_ICONINFORMATION);
+		
 		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileNameA_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
-
+		
 		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
 		{
-			MessageBoxA(nullptr, "replace_filename", "cod-mod", MB_ICONINFORMATION);
+			//MessageBoxA(nullptr, "replace_filename", "cod-mod", MB_ICONINFORMATION);
 
 			std::filesystem::path path = lpFilename;
 			auto binary = game::environment::get_binary();
@@ -63,6 +61,7 @@ namespace game_module
 			std::string pathStr = path.string();
 			strncpy(lpFilename, pathStr.c_str(), nSize - 1);
 		}
+
 		return ret;
 	}
 
@@ -81,10 +80,59 @@ namespace game_module
 				cgame_mp = hModule;
 				hook_dll_cg_mp();
 			}
+
+			/*if (!strcmp(fileName, "psapi.dll"))
+			{
+				MessageBoxA(nullptr, "psapi.dll", "cod-mod", MB_ICONINFORMATION);
+			}*/
 		}
 
 		return ret;
 	}
+
+
+
+
+
+
+	/*utils::hook::detour nt_GetModuleFileNameW_hook;
+	DWORD WINAPI nt_GetModuleFileNameW_stub(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
+	{
+		//MessageBoxA(nullptr, "nt_GetModuleFileNameW_stub", "cod-mod", MB_ICONINFORMATION);
+		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileNameW_hook.get_original());
+		auto ret = orig(hModule, lpFilename, nSize);
+
+		if (!wcscmp(PathFindFileNameW(lpFilename), L"cod-mod.exe"))
+		{
+			std::filesystem::path path = lpFilename;
+			auto binary = game::environment::get_binary();
+			path.replace_filename(binary);
+			std::string pathStr = path.string();
+			std::wstring pathWstr(pathStr.begin(), pathStr.end());
+			wcsncpy(lpFilename, pathWstr.c_str(), nSize - 1);
+			//MessageBoxW(nullptr, lpFilename, L"cod-mod", MB_ICONINFORMATION);
+		}
+
+		return ret;
+	}*/
+
+
+
+	/*utils::hook::detour nt_Test_hook;
+	DWORD WINAPI nt_Test_stub(HANDLE hProcess, LPVOID lpv, LPSTR lpImageFileName, DWORD nSize)
+	{
+		MessageBoxA(nullptr, "nt_Test_stub", "cod-mod", MB_ICONINFORMATION);
+		auto* orig = static_cast<decltype(GetMappedFileNameA)*>(nt_Test_hook.get_original());
+		auto ret = orig(hProcess, lpv, lpImageFileName, nSize);
+		return ret;
+	}*/
+
+
+
+
+
+
+
 	
 	class component final : public component_interface
 	{
@@ -102,6 +150,14 @@ namespace game_module
 
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
 			nt_LoadLibraryA_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibraryA_stub);
+
+
+
+			//nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
+			//const utils::nt::library psapi("psapi.dll");
+			//nt_Test_hook.create(psapi.get_proc<DWORD(WINAPI*)(HANDLE, LPVOID, LPSTR, DWORD)>("GetMappedFileNameA"), nt_Test_stub);
+
+
 		}
 	};
 }

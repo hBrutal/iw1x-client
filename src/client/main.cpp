@@ -225,6 +225,18 @@ void apply_environment()
 
 int main()
 {
+
+
+
+    /*if (PSAPI_VERSION == 2)
+    {
+        MessageBoxA(nullptr, "PSAPI_VERSION 2", "cod-mod", MB_ICONINFORMATION);
+    }
+    LoadLibraryA("psapi.dll");*/
+
+
+
+
     AddVectoredExceptionHandler(0, exception_handler);
     SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
