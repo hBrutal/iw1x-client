@@ -16,9 +16,9 @@ BEGIN
 BLOCK "040904b0"
 BEGIN
 VALUE "FileDescription", "CoDMP.exe"
-VALUE "InternalName", "CoDMP"
+VALUE "InternalName", "CoDMP.exe"
 VALUE "OriginalFilename", "CoDMP.exe"
-VALUE "ProductName", "CoDMP"
+VALUE "ProductName", "CoDMP.exe"
 END
 END
 END

@@ -48,11 +48,15 @@ namespace game_module
 	// Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
 	DWORD WINAPI nt_GetModuleFileNameA_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
+		MessageBoxA(nullptr, "nt_GetModuleFileNameA_stub", "cod-mod", MB_ICONINFORMATION);
+
 		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileNameA_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 
 		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
 		{
+			MessageBoxA(nullptr, "replace_filename", "cod-mod", MB_ICONINFORMATION);
+
 			std::filesystem::path path = lpFilename;
 			auto binary = game::environment::get_binary();
 			path.replace_filename(binary);
