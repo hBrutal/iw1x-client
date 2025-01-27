@@ -90,35 +90,58 @@ namespace game_module
 
 
 
+
+
+
+
 	utils::hook::detour nt_Test_hook;
-	LPSTR WINAPI nt_Test_stub()
+	NTSTATUS WINAPI nt_Test_stub(const HANDLE handle, const PROCESSINFOCLASS info_class, const PVOID info, const ULONG info_length, const PULONG ret_length)
 	{
-		auto* orig = static_cast<decltype(GetCommandLineA)*>(nt_Test_hook.get_original());
-		auto ret = orig();
+		auto* orig = static_cast<decltype(NtQueryInformationProcess)*>(nt_Test_hook.get_original());
+		const auto status = orig(handle, info_class, info, info_length, ret_length);
 
-		//MessageBoxA(nullptr, ret, "cod-mod", MB_ICONINFORMATION);
-		
-		std::string pathStr = ret;
-		pathStr.erase(pathStr.begin());
-		pathStr.erase(pathStr.size() - 2);
-		
-		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
+		if (NT_SUCCESS(status) && info_class == ProcessBasicInformation)
 		{
-			std::filesystem::path pathFs = pathStr;
-			
-			auto binary = game::environment::get_binary();
-			pathFs.replace_filename(binary);
-			pathStr = pathFs.string();
-			
-			pathStr.insert(pathStr.begin(), '\"');
-			pathStr.insert(pathStr.end(), '\"');
-			
-			strncpy(ret, pathStr.c_str(), strlen(ret) - 1);
+			auto* pbi = reinterpret_cast<PROCESS_BASIC_INFORMATION*>(info);
+			PEB peb;
+			if (ReadProcessMemory(handle, reinterpret_cast<LPCVOID>(pbi->PebBaseAddress), &peb, sizeof(PEB), nullptr))
+			{
+				RTL_USER_PROCESS_PARAMETERS up;
+				if (ReadProcessMemory(handle, reinterpret_cast<LPCVOID>(peb.ProcessParameters), &up, sizeof(RTL_USER_PROCESS_PARAMETERS), nullptr))
+				{
+					UNICODE_STRING imagePathName = up.ImagePathName;
+					wchar_t exePath[MAX_PATH];
 
-			//MessageBoxA(nullptr, ret, "cod-mod", MB_ICONINFORMATION);
+					if (ReadProcessMemory(handle, reinterpret_cast<LPCVOID>(imagePathName.Buffer), exePath, imagePathName.Length, nullptr))
+					{
+						exePath[imagePathName.Length / sizeof(wchar_t)] = L'\0';
+						std::wstring pathWstr(exePath);
+						std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+						std::string pathStr = converter.to_bytes(pathWstr);
+						
+						if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
+						{
+							std::filesystem::path pathFs = pathStr;
+							auto binary = game::environment::get_binary();
+							pathFs.replace_filename(binary);
+							pathStr = pathFs.string();
+							
+							int bufferSize = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, nullptr, 0);
+							LPWSTR wideStr = new wchar_t[bufferSize];
+							MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, wideStr, bufferSize);
+
+							up.ImagePathName.Buffer = wideStr;
+							up.ImagePathName.Length = wcslen(wideStr) * sizeof(wchar_t);
+							up.ImagePathName.MaximumLength = MAX_PATH;
+							WriteProcessMemory(handle, reinterpret_cast<LPVOID>(peb.ProcessParameters), &up, sizeof(RTL_USER_PROCESS_PARAMETERS), nullptr);
+							delete[] wideStr;
+						}
+					}
+				}
+			}
 		}
 
-		return ret;
+		return status;
 	}
 
 
@@ -144,10 +167,11 @@ namespace game_module
 
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
 			nt_LoadLibraryA_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibraryA_stub);
-
-
-
-			nt_Test_hook.create(kernel32.get_proc<LPSTR(WINAPI*)()>("GetCommandLineA"), nt_Test_stub);
+			
+			
+			
+			const utils::nt::library ntdll("ntdll.dll");
+			nt_Test_hook.create(ntdll.get_proc<void*>("NtQueryInformationProcess"), nt_Test_stub);
 
 
 

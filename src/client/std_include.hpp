@@ -42,6 +42,7 @@
 #include <queue>
 #include <sstream>
 #include <string>
+#include <codecvt>
 
 #include <gsl/gsl>
 #include <MinHook.h>
@@ -54,11 +55,6 @@
 
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
-
-
-//#pragma comment(lib, "psapi.lib")
-
-
 
 #include "resource.hpp"
 

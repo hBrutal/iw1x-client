@@ -165,10 +165,7 @@ void remove_crash_file()
     auto name = self.get_name();
     name = std::filesystem::path(name).replace_extension("").generic_string();
 
-    utils::io::remove_file("__" + name);
-    utils::io::remove_file("__codmp");
-    utils::io::remove_file("__codsp");
-    utils::io::remove_file("__mohaa");
+    //utils::io::remove_file("__" + name);
 }
 
 void limit_parallel_dll_loading()
@@ -225,18 +222,6 @@ void apply_environment()
 
 int main()
 {
-
-
-
-    /*if (PSAPI_VERSION == 2)
-    {
-        MessageBoxA(nullptr, "PSAPI_VERSION 2", "cod-mod", MB_ICONINFORMATION);
-    }
-    LoadLibraryA("psapi.dll");*/
-
-
-
-
     AddVectoredExceptionHandler(0, exception_handler);
     SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
