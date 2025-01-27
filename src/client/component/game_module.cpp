@@ -45,30 +45,30 @@ namespace game_module
 	{
 		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileName_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
-		std::string path(lpFilename);
-		if (path.find("cod-mod.exe") != std::string::npos)
+
+		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
 		{
-			size_t lastSlash = path.find_last_of("\\/");
-			if (lastSlash != std::string::npos)
-			{
-				auto binary = game::environment::get_binary();
-				path = path.substr(0, lastSlash + 1) + binary;
-			}
-			strncpy(lpFilename, path.c_str(), nSize - 1);
+			std::filesystem::path path = lpFilename;
+			auto binary = game::environment::get_binary();
+			path.replace_filename(binary);
+			std::string pathStr = path.string();
+			strncpy(lpFilename, pathStr.c_str(), nSize - 1);
 			lpFilename[nSize - 1] = '\0';
 		}
 		return ret;
 	}
 
-	HMODULE WINAPI nt_LoadLibrary_stub(LPCSTR lpFileName)
+	HMODULE WINAPI nt_LoadLibrary_stub(LPCSTR lpLibFileName)
 	{
 		auto* orig = static_cast<decltype(LoadLibraryA)*>(nt_LoadLibrary_hook.get_original());
-		auto ret = orig(lpFileName);
-		DWORD hModule = (DWORD)GetModuleHandleA(lpFileName);
+		auto ret = orig(lpLibFileName);
+		auto hModule = (DWORD)GetModuleHandleA(lpLibFileName);
 
-		if (lpFileName != NULL)
+		if (lpLibFileName != NULL)
 		{
-			if (strstr(lpFileName, "cgame_mp_x86"))
+			auto fileName = PathFindFileNameA(lpLibFileName);
+			
+			if (!strcmp(fileName, "cgame_mp_x86.dll"))
 			{
 				cgame_mp = hModule;
 				hook_dll_cg_mp();
