@@ -25,6 +25,8 @@
 #include <atlbase.h>
 #include <iphlpapi.h>
 #include <wincrypt.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 // min and max is required by gdi, therefore NOMINMAX won't work
 #ifdef max
@@ -55,6 +57,8 @@
 
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glu32.lib")
 
 #include "resource.hpp"
 

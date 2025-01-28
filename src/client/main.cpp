@@ -164,8 +164,7 @@ void remove_crash_file()
     const utils::nt::library self;
     auto name = self.get_name();
     name = std::filesystem::path(name).replace_extension("").generic_string();
-
-    //utils::io::remove_file("__" + name);
+    utils::io::remove_file("__" + name);
 }
 
 void limit_parallel_dll_loading()
@@ -275,7 +274,7 @@ int main()
             return 1;
         }
     }
-
+    
     return static_cast<int>(entry_point());
 }
 

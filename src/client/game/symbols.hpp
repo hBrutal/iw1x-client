@@ -31,6 +31,9 @@ namespace game
 
 	//WEAK symbol<int> keyCatchers{0x1417CF6E0, 0x1419E1ADC};
 
+
+	//WEAK symbol<const char*> glConfig_vendor_string{ 0x0, 0x0050ac9b };
+
 	
 
 

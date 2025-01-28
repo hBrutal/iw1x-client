@@ -5,14 +5,11 @@ namespace game
 
 
 
-	/*struct Font_s
+	/*struct scr_entref_t
 	{
-		const char* fontName;
-		int pixelHeight;
-		int glyphCount;
-		Material* material;
-		Material* glowMaterial;
-		Glyph* glyphs;
+		char renderer_string[MAX_STRING_CHARS];
+		char vendor_string[MAX_STRING_CHARS];
+		// ...
 	};*/
 
 
