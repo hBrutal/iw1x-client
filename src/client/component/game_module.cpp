@@ -102,6 +102,7 @@ namespace game_module
 
 			size_t copyLength = std::min((size_t)nSize - 1, wcslen(wideStr));
 			wcsncpy(lpFilename, wideStr, copyLength);
+			lpFilename[copyLength] = L'\0';
 			delete[] wideStr;
 		}
 
