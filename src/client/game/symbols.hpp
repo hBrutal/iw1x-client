@@ -1,17 +1,12 @@
 #pragma once
 
 
-
-
 #define WEAK __declspec(selectany)
-
 
 
 namespace game
 {
 	
-
-
 
 
 	/***************************************************************
@@ -21,6 +16,7 @@ namespace game
 	//WEAK symbol<Font_s* (const char* font)> trap_R_RegisterFont{ 0x0, CGAME_OFF(0x301ad770) };
 	//WEAK symbol<void(const char* message)> CG_ServerCommand{ 0x0, 0x3002e0d0 };
 	
+
 
 
 
@@ -48,4 +44,6 @@ namespace game
 	{
 		WEAK symbol<cg_s> cgArray{0, 0x14176EC00};
 	}*/
+
+
 }

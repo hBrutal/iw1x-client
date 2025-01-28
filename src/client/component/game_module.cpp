@@ -12,7 +12,8 @@ namespace game_module
 	DWORD cgame_mp;
 	
 	utils::hook::detour nt_LoadLibraryA_hook;
-	utils::hook::detour nt_GetModuleFileName_hook;
+	utils::hook::detour nt_GetModuleFileNameA_hook;
+	utils::hook::detour nt_GetModuleFileNameW_hook;
 	utils::hook::detour CG_ServerCommand_hook;
 
 	utils::nt::library get_client_module()
@@ -61,13 +62,11 @@ namespace game_module
 		return ret;
 	}
 	
-	//// Return client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
-	// Tested on: AMD, Intel HD Graphics
+	//// Return original client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
+	// For AMD and Intel HD Graphics
 	DWORD WINAPI nt_GetModuleFileNameA_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
-		//MessageBoxA(nullptr, "nt_GetModuleFileNameA_stub", "cod-mod", MB_ICONINFORMATION);
-
-		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileName_hook.get_original());
+		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileNameA_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 		
 		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
@@ -81,10 +80,10 @@ namespace game_module
 
 		return ret;
 	}
-	// Tested on: Nvidia
+	// For Nvidia
 	DWORD WINAPI nt_GetModuleFileNameW_stub(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 	{
-		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileName_hook.get_original());
+		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileNameW_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
@@ -101,44 +100,14 @@ namespace game_module
 			LPWSTR wideStr = new wchar_t[bufferSize];
 			MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, wideStr, bufferSize);
 
-			wcsncpy(lpFilename, wideStr, nSize - 1);
+			size_t copyLength = std::min((size_t)nSize - 1, wcslen(wideStr));
+			wcsncpy(lpFilename, wideStr, copyLength);
 			delete[] wideStr;
 		}
 
 		return ret;
 	}
 	////
-
-
-
-
-
-
-
-
-#if 0
-	utils::hook::detour test_hook;
-	BOOL WINAPI test_stub(HDC glw_state_hDC, HGLRC glw_state_hGLRC)
-	{
-
-
-
-
-		/*const GLubyte* vendor = glGetString(GL_VENDOR);
-		std::string vendorStr(reinterpret_cast<const char*>(vendor));
-		const utils::nt::library kernel32("kernel32.dll");
-		if (vendorStr == "NVIDIA Corporation")
-			nt_GetModuleFileName_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
-		else
-			nt_GetModuleFileName_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);*/
-
-
-		//return ret;
-	}
-#endif
-
-
-
 	
 	class component final : public component_interface
 	{
@@ -155,16 +124,8 @@ namespace game_module
 			const utils::nt::library kernel32("kernel32.dll");
 			
 			nt_LoadLibraryA_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibraryA_stub);
-
-			nt_GetModuleFileName_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
-
-			
-			
-			
-
-			//utils::hook::call(0x00508021, test_stub);
-
-
+			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
+			nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
 
 		}
 	};
