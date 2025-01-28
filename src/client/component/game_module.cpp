@@ -56,8 +56,6 @@ namespace game_module
 			path.replace_filename(binary);
 			std::string pathStr = path.string();
 			strncpy(lpFilename, pathStr.c_str(), nSize - 1);
-
-			MessageBoxA(nullptr, "replaced", "cod-mod", MB_ICONINFORMATION);
 		}
 
 		return ret;
@@ -88,15 +86,7 @@ namespace game_module
 
 
 
-
-
-
-
-
-
-
-
-	utils::hook::detour nt_Test_hook;
+	/*utils::hook::detour nt_Test_hook;
 	NTSTATUS WINAPI nt_Test_stub(const HANDLE handle, const PROCESSINFOCLASS info_class, const PVOID info, const ULONG info_length, const PULONG ret_length)
 	{
 		auto* orig = static_cast<decltype(NtQueryInformationProcess)*>(nt_Test_hook.get_original());
@@ -144,7 +134,46 @@ namespace game_module
 		}
 
 		return status;
+	}*/
+
+
+
+
+
+
+
+
+
+	utils::hook::detour nt_GetModuleFileNameW_hook;
+	DWORD WINAPI nt_GetModuleFileNameW_stub(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
+	{
+		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileNameW_hook.get_original());
+		auto ret = orig(hModule, lpFilename, nSize);
+		
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		std::string pathStr = converter.to_bytes(lpFilename);
+		
+		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
+		{
+			std::filesystem::path pathFs = pathStr;
+			auto binary = game::environment::get_binary();
+			pathFs.replace_filename(binary);
+			pathStr = pathFs.string();
+			
+			int bufferSize = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, nullptr, 0);
+			LPWSTR wideStr = new wchar_t[bufferSize];
+			MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, wideStr, bufferSize);
+
+			wcsncpy(lpFilename, wideStr, nSize - 1);
+			delete[] wideStr;
+
+			MessageBoxW(nullptr, lpFilename, L"cod-mod", MB_ICONINFORMATION);
+		}
+
+		return ret;
 	}
+
+
 
 
 
@@ -172,8 +201,12 @@ namespace game_module
 			
 			
 			
-			const utils::nt::library ntdll("ntdll.dll");
-			nt_Test_hook.create(ntdll.get_proc<void*>("NtQueryInformationProcess"), nt_Test_stub);
+			/*const utils::nt::library ntdll("ntdll.dll");
+			nt_Test_hook.create(ntdll.get_proc<void*>("NtQueryInformationProcess"), nt_Test_stub);*/
+
+
+
+			//nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
 
 
 
