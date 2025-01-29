@@ -167,56 +167,12 @@ void remove_crash_file()
     utils::io::remove_file("__" + name);
 }
 
-void limit_parallel_dll_loading()
-{
-    const utils::nt::library self;
-    const auto registry_path = R"(Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\)" + self.
-        get_name();
-
-    HKEY key = nullptr;
-    if (RegCreateKeyA(HKEY_LOCAL_MACHINE, registry_path.data(), &key) == ERROR_SUCCESS)
-    {
-        RegCloseKey(key);
-    }
-
-    key = nullptr;
-    if (RegOpenKeyExA(
-        HKEY_LOCAL_MACHINE, registry_path.data(), 0,
-        KEY_ALL_ACCESS, &key) != ERROR_SUCCESS)
-    {
-        return;
-    }
-
-    DWORD value = 1;
-    RegSetValueExA(key, "MaxLoaderThreads", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-
-    RegCloseKey(key);
-}
-
 void enable_dpi_awareness()
 {
     const utils::nt::library user32{ "user32.dll" };
     const auto set_dpi = user32 ? user32.get_proc<BOOL(WINAPI*)(DPI_AWARENESS_CONTEXT)>("SetProcessDpiAwarenessContext") : nullptr;
     if (set_dpi)
         set_dpi(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-}
-
-void apply_environment()
-{
-    char* buffer{};
-    std::size_t size{};
-    if (_dupenv_s(&buffer, &size, "GHOSTS_INSTALL") != 0 || buffer == nullptr)
-    {
-        return;
-    }
-
-    const auto _ = gsl::finally([&]
-        {
-            std::free(buffer);
-        });
-
-    SetCurrentDirectoryA(buffer);
-    SetDllDirectoryA(buffer);
 }
 
 int main()
@@ -226,10 +182,6 @@ int main()
 
     FARPROC entry_point;
     enable_dpi_awareness();
-
-    // This requires admin privilege, but I suppose many
-    // people will start with admin rights if it crashes.
-    //limit_parallel_dll_loading();
 
     std::srand(static_cast<std::uint32_t>(time(nullptr)) ^ ~(GetTickCount() * GetCurrentProcessId()));
 
@@ -245,7 +197,6 @@ int main()
 
         try
         {
-            //apply_environment();
             remove_crash_file();
 
             if (!component_loader::post_start()) return 0;

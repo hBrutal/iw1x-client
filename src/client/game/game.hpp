@@ -1,8 +1,14 @@
 #pragma once
 
+#include "structs.hpp"
 #include "launcher/launcher.hpp"
 
 #define SELECT_VALUE(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
+#define cgame_mp_offset(relative) (cgame_mp + (relative - 0x30000000))
+#define ui_mp_offset(relative) (ui_mp + (relative - 0x40000000))
+
+extern DWORD cgame_mp;
+extern DWORD ui_mp;
 
 namespace game
 {
@@ -24,19 +30,15 @@ namespace game
 	class symbol
 	{
 	public:
-		symbol(const size_t sp_address, const size_t mp_address)
-			: sp_object_(reinterpret_cast<T*>(sp_address))
-			  , mp_object_(reinterpret_cast<T*>(mp_address))
+		symbol(const size_t sp_address, const size_t mp_address) : 
+			sp_object_(reinterpret_cast<T*>(sp_address)), mp_object_(reinterpret_cast<T*>(mp_address))
 		{
 		}
 
 		T* get() const
 		{
 			if (environment::is_sp())
-			{
 				return sp_object_;
-			}
-
 			return mp_object_;
 		}
 
@@ -49,7 +51,6 @@ namespace game
 		{
 			return this->get();
 		}
-
 	private:
 		T* sp_object_;
 		T* mp_object_;

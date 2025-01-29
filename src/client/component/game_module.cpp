@@ -5,12 +5,11 @@
 
 #include <utils/hook.hpp>
 
-#define cgame_mp_offset(relative) (cgame_mp + (relative - 0x30000000))
+DWORD cgame_mp;
+DWORD ui_mp;
 
 namespace game_module
 {
-	DWORD cgame_mp;
-	
 	utils::hook::detour nt_LoadLibraryA_hook;
 	utils::hook::detour nt_GetModuleFileNameA_hook;
 	utils::hook::detour nt_GetModuleFileNameW_hook;
@@ -56,6 +55,10 @@ namespace game_module
 			{
 				cgame_mp = hModule;
 				hook_dll_cg_mp();
+			}
+			else if (!strcmp(fileName, "ui_mp_x86.dll"))
+			{
+				ui_mp = hModule;
 			}
 		}
 
