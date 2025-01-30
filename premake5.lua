@@ -66,12 +66,6 @@ function dependencies.projects()
 	end
 end
 
-newoption {
-	trigger = "copy-to",
-	description = "Optional, copy the exe to a custom folder after build, define the path here if wanted.",
-	value = "PATH"
-}
-
 newaction {
 	trigger = "version",
 	description = "Returns the version string for the current commit of the source code.",
@@ -292,12 +286,6 @@ resincludedirs {"$(ProjectDir)src"}
 links {"common"}
 
 prebuildcommands {"pushd %{_MAIN_SCRIPT_DIR}", "premake5 generate-buildinfo", "popd"}
-
-if _OPTIONS["copy-to"] then
-	postbuildcommands {
-		"copy /y \"$(TargetDir)*.exe\" \"" .. _OPTIONS["copy-to"] .. "\""
-	}
-end
 
 dependencies.imports()
 

@@ -22,6 +22,10 @@
 #undef min
 #endif
 
+#define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, "cod-mod: INFORMATION", MB_ICONINFORMATION);
+#define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, "cod-mod: WARNING", MB_ICONWARNING);
+#define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, "cod-mod: ERROR", MB_ICONERROR);
+
 #include <cassert>
 #include <chrono>
 #include <filesystem>
