@@ -169,14 +169,14 @@ namespace utils::hook
         set<int32_t>(patch_pointer + 1, int32_t(size_t(data) - (size_t(pointer) + 5)));
     }
 
-    void jump(const size_t pointer, void* data, const bool use_far)
+    void jump(const size_t pointer, void* data)
     {
-        return jump(reinterpret_cast<void*>(pointer), data, use_far);
+        return jump(reinterpret_cast<void*>(pointer), data);
     }
 
-    void jump(const size_t pointer, const size_t data, const bool use_far)
+    void jump(const size_t pointer, const size_t data)
     {
-        return jump(pointer, reinterpret_cast<void*>(data), use_far);
+        return jump(pointer, reinterpret_cast<void*>(data));
     }
 
     void inject(void* pointer, const void* data)

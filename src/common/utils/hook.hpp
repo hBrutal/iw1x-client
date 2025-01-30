@@ -100,9 +100,9 @@ namespace utils::hook
     void call(size_t pointer, void* data);
     void call(size_t pointer, size_t data);
 
-    void jump(void* pointer, void* data, bool use_far = false);
-    void jump(size_t pointer, void* data, bool use_far = false);
-    void jump(size_t pointer, size_t data, bool use_far = false);
+    void jump(void* pointer, void* data);
+    void jump(size_t pointer, void* data);
+    void jump(size_t pointer, size_t data);
 
     void inject(void* pointer, const void* data);
     void inject(size_t pointer, const void* data);
