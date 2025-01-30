@@ -162,7 +162,7 @@ namespace utils::hook
         return call(pointer, reinterpret_cast<void*>(data));
     }
     
-    void jump(void* pointer, void* data, const bool use_far)
+    void jump(void* pointer, void* data)
     {
         auto* patch_pointer = PBYTE(pointer);
         set<uint8_t>(patch_pointer, 0xE9);
