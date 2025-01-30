@@ -11,6 +11,7 @@
 #include <csetjmp>
 #include <ShlObj.h>
 #include <atlbase.h>
+#include <dwmapi.h>
 
 // min and max is required by gdi, therefore NOMINMAX won't work
 #ifdef max

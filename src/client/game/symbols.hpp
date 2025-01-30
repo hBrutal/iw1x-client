@@ -9,9 +9,16 @@ namespace game
 	 **************************************************************/
 
 
-	WEAK symbol<void()> Com_Frame{ 0, 0x00437f40 };
-	WEAK symbol<void(int msec)> SV_Frame{ 0, 0x0045b1d0 };
-	WEAK symbol<void(float x, float y, int font, float scale, float* color, const char* text, float spacing, int limit, int flags)> SCR_DrawString{ 0x0, 0x4DF570 };
+	WEAK symbol<void ()> Com_Frame{ 0, 0x00437f40 };
+	WEAK symbol<void (int msec)> SV_Frame{ 0, 0x0045b1d0 };
+	WEAK symbol<void (float x, float y, int font, float scale, float* color, const char* text, float spacing, int limit, int flags)> SCR_DrawString{ 0x0, 0x4DF570 };
+
+
+
+	WEAK symbol<cvar_t* (const char* var_name)> Cvar_FindVar{ 0, 0x00439280 };
+	WEAK symbol<cvar_t* (const char* var_name, const char* var_value, int flags)> Cvar_Get{ 0, 0x00439350 };
+
+
 
 
 
@@ -37,12 +44,16 @@ namespace game
 	/*namespace sp
 	{
 		WEAK symbol<gentity_s> g_entities{0x143C91600, 0};
-	}
+	}*/
 
 	namespace mp
 	{
-		WEAK symbol<cg_s> cgArray{0, 0x14176EC00};
-	}*/
+		//WEAK symbol<cg_s> cgArray{0, 0x14176EC00};
+
+		WEAK symbol<int> ping{ 0, 0x41405d };
+
+
+	}
 
 
 }

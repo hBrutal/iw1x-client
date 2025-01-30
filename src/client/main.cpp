@@ -152,9 +152,14 @@ FARPROC load_binary(const launcher::mode mode)
         game::environment::set_mohaa();
 
     auto binary = game::environment::get_binary();
+
     std::string data;
     if (!utils::io::read_file(binary, &data))
-        throw std::runtime_error("Failed to read game binary");
+    {
+        throw std::runtime_error(utils::string::va(
+            "Failed to read %s\nIs cod-mod into your Call of Duty folder?",
+            binary.data()));
+    }
 
     return loader.load(self, data);
 }
