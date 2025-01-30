@@ -1,4 +1,5 @@
 #include <std_include.hpp>
+#if 0
 #include "loader/component_loader.hpp"
 
 #include "scheduler.hpp"
@@ -11,7 +12,6 @@
 
 namespace fps
 {
-#if 0
 	namespace
 	{
 		const game::cvar_t* cg_drawFPS;
@@ -150,12 +150,11 @@ namespace fps
 	{
 		return static_cast<std::int32_t>(static_cast<float>(1000.0f / static_cast<float>(cg_perf.average)) + 9.313225746154785e-10);
 	}
-#endif
 
 	class component final : public component_interface
 	{
 	public:
-		/*void post_unpack() override
+		void post_unpack() override
 		{
 			if (game::environment::is_dedi())
 			{
@@ -175,8 +174,9 @@ namespace fps
 				cg_drawPing = game::Cvar_Get("cg_drawPing", 0, game::CVAR_FLAG_ARCHIVE);
 				scheduler::loop(cg_draw_ping, scheduler::pipeline::renderer);
 			}
-		}*/
+		}
 	};
 }
 
 REGISTER_COMPONENT(fps::component)
+#endif
