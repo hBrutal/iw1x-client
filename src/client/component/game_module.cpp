@@ -78,7 +78,8 @@ namespace game_module
 			auto binary = game::environment::get_binary();
 			path.replace_filename(binary);
 			std::string pathStr = path.string();
-			strncpy(lpFilename, pathStr.c_str(), nSize - 1);
+			std::copy(pathStr.begin(), pathStr.end(), lpFilename);
+			lpFilename[pathStr.size()] = '\0';
 		}
 
 		return ret;

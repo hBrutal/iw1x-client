@@ -24,7 +24,7 @@ namespace branding
 				const auto x = 1;
 				const auto y = 10;
 				const auto font = 1;
-				const auto scale = 0.20;
+				const auto scale = 0.20f;
 				float color[4] = { 0.666f, 0.666f, 0.666f, 0.666f };
 				const auto* text = "cod-mod";
 				
