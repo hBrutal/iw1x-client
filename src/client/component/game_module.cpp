@@ -90,24 +90,18 @@ namespace game_module
 		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileNameW_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::string pathStr = converter.to_bytes(lpFilename);
+		int bufferSize_w_to_s = WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, NULL, 0, NULL, NULL);
+		std::string pathStr(bufferSize_w_to_s - 1, 0);
+		WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, &pathStr[0], bufferSize_w_to_s, NULL, NULL);
 
 		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
 		{
 			std::filesystem::path pathFs = pathStr;
 			auto binary = game::environment::get_binary();
 			pathFs.replace_filename(binary);
-			pathStr = pathFs.string();
 
-			int bufferSize = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, nullptr, 0);
-			LPWSTR wideStr = new wchar_t[bufferSize];
-			MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, wideStr, bufferSize);
-
-			size_t copyLength = std::min((size_t)nSize - 1, wcslen(wideStr));
-			wcsncpy(lpFilename, wideStr, copyLength);
-			lpFilename[copyLength] = L'\0';
-			delete[] wideStr;
+			int bufferSize_s_to_w = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, nullptr, 0);
+			MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, lpFilename, bufferSize_s_to_w);
 		}
 
 		return ret;
