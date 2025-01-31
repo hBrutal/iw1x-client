@@ -12,6 +12,7 @@
 #include <ShlObj.h>
 #include <atlbase.h>
 #include <dwmapi.h>
+#include <GL/gl.h>
 
 // min and max is required by gdi, therefore NOMINMAX won't work
 #ifdef max
@@ -22,9 +23,9 @@
 #undef min
 #endif
 
-#define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, "cod-mod: INFORMATION", MB_ICONINFORMATION);
-#define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, "cod-mod: WARNING", MB_ICONWARNING);
-#define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, "cod-mod: ERROR", MB_ICONERROR);
+#define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, "", MB_ICONINFORMATION);
+#define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, "", MB_ICONWARNING);
+#define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, "Error", MB_ICONERROR);
 
 #include <cassert>
 #include <chrono>
@@ -33,16 +34,19 @@
 #include <queue>
 #include <sstream>
 #include <string>
-#include <codecvt>
 
 #include <gsl/gsl>
 #include <MinHook.h>
+#include <imgui.h>
+#include <backends/imgui_impl_opengl2.h>
+#include <backends/imgui_impl_win32.h>
 
 #include <asmjit/core/jitruntime.h>
 #include <asmjit/x86/x86assembler.h>
 
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
+#pragma comment(lib, "opengl32.lib")
 
 #include "resource.hpp"
 

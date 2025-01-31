@@ -101,11 +101,6 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 			{
 				auto * import = PIMAGE_IMPORT_BY_NAME(target.get_ptr() + *name_table_entry);
 				function_name = import->Name;
-
-				/*std::ostringstream oss;
-				oss << "######## " << function_name << "\n";
-				std::string str = oss.str();
-				OutputDebugStringA(str.c_str());*/
 				
 				if (this->import_resolver_) function = FARPROC(this->import_resolver_(name, function_name));
 				if (!function)
@@ -117,6 +112,11 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 					}
 				}
 			}
+
+			/*std::ostringstream oss;
+			oss << "######" << function_name.data() << "\n";
+			std::string result = oss.str();
+			OutputDebugString(result.c_str());*/
 
 			if (!function)
 			{

@@ -21,7 +21,7 @@ namespace game
 			return mode;
 		}
 
-		std::string get_binary()
+		std::string get_client_filename()
 		{
 			switch (mode)
 			{

@@ -15,7 +15,7 @@ namespace game
 	namespace environment
 	{
 		launcher::mode get_mode();
-		std::string get_binary();
+		std::string get_client_filename();
 
 		bool is_mp();
 		bool is_sp();

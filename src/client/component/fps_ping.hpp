@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fps
+namespace fps_ping
 {
 	int get_fps();
 }

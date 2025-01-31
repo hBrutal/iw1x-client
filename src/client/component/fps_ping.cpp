@@ -3,14 +3,14 @@
 #include "loader/component_loader.hpp"
 
 #include "scheduler.hpp"
-#include "fps.hpp"
+#include "fps_ping.hpp"
 
 #include "game/game.hpp"
 
 #include <utils/hook.hpp>
 #include <utils/string.hpp>
 
-namespace fps
+namespace fps_ping
 {
 	namespace
 	{
@@ -129,7 +129,7 @@ namespace fps
 				if (!font) return;*/
 				int font = 1;
 
-				auto* const ping_string = utils::string::va("Ping: %i", *game::mp::ping);
+				auto* const ping_string = utils::string::va("Ping: %i", *game::ping);
 
 				const auto scale = 1.0f;
 
@@ -178,5 +178,5 @@ namespace fps
 	};
 }
 
-REGISTER_COMPONENT(fps::component)
+REGISTER_COMPONENT(fps_ping::component)
 #endif

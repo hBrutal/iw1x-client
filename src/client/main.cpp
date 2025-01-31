@@ -27,6 +27,12 @@ const char* get_current_date()
     return utils::string::va("%s", result.data());
 }
 
+void remove_crash_file()
+{
+    utils::io::remove_file("__codmp");
+    utils::io::remove_file("__cosp");
+}
+
 LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
 {
     if (exception_info->ExceptionRecord->ExceptionCode == 0x406D1388)
@@ -67,7 +73,7 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
             exception_info->ExceptionRecord->ExceptionCode,
             exception_info->ExceptionRecord->ExceptionAddress);
         //game::show_error(buf);
-        MessageBoxA(nullptr, buf, "cod-mod", MB_ICONINFORMATION);
+        MSG_BOX_ERROR(buf);
     }
 
     CloseHandle(file_handle);
@@ -78,6 +84,7 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
 
 [[noreturn]] void WINAPI exit_hook(const int code)
 {
+
     component_loader::pre_destroy();
     std::exit(code);
 }
@@ -143,33 +150,26 @@ FARPROC load_binary(const launcher::mode mode)
             return component_loader::load_import(library, function);
         });
 
-    // Check if the CoD file is named mohaa
+    //// Check if the CoD file is named mohaa
     char path[MAX_PATH];
     GetModuleFileNameA(NULL, path, sizeof(path));
     std::filesystem::path pathFs = path;
     pathFs.replace_filename("mohaa.exe");
     if (utils::io::file_exists(pathFs.string()))
         game::environment::set_mohaa();
+    ////
 
-    auto binary = game::environment::get_binary();
+    auto client_filename = game::environment::get_client_filename();
 
     std::string data;
-    if (!utils::io::read_file(binary, &data))
-    {
-        throw std::runtime_error(utils::string::va(
-            "Failed to read %s\nIs cod-mod into your Call of Duty folder?",
-            binary.data()));
-    }
+    if (!utils::io::read_file(client_filename, &data))
+        throw std::runtime_error(utils::string::va("Failed to read %s\nIs cod-mod into your Call of Duty folder?", client_filename.data()));
+
+#ifdef DEBUG
+    remove_crash_file();
+#endif
 
     return loader.load(self, data);
-}
-
-void remove_crash_file()
-{
-    const utils::nt::library self;
-    auto name = self.get_name();
-    name = std::filesystem::path(name).replace_extension("").generic_string();
-    utils::io::remove_file("__" + name);
 }
 
 void enable_dpi_awareness()
@@ -180,61 +180,48 @@ void enable_dpi_awareness()
         set_dpi(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 }
 
-int main()
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
     AddVectoredExceptionHandler(0, exception_handler);
     SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
-
-    FARPROC entry_point;
     enable_dpi_awareness();
 
-    std::srand(static_cast<std::uint32_t>(time(nullptr)) ^ ~(GetTickCount() * GetCurrentProcessId()));
-
-    {
-        auto premature_shutdown = true;
-        const auto _ = gsl::finally([&premature_shutdown]()
-            {
-                if (premature_shutdown)
-                {
-                    component_loader::pre_destroy();
-                }
-            });
-
-        try
+    auto premature_shutdown = true;
+    const auto _ = gsl::finally([&premature_shutdown]()
         {
-            remove_crash_file();
-
-            if (!component_loader::post_start()) return 0;
-
-            auto mode = detect_mode_from_arguments();
-            if (mode == launcher::mode::none)
+            if (premature_shutdown)
             {
-                const launcher launcher;
-                mode = launcher.run();
-                if (mode == launcher::mode::none) return 0;
+                component_loader::pre_destroy();
             }
+        });
 
-            game::environment::set_mode(mode);
+    FARPROC entry_point;
+    try
+    {
+        if (!component_loader::post_start())
+            return 0;
 
-            entry_point = load_binary(mode);
-
-            if (!entry_point) throw std::runtime_error("Unable to load binary into memory");
-            if (!component_loader::post_load()) return 0;
-
-            premature_shutdown = false;
-        }
-        catch (std::exception& ex)
+        auto mode = detect_mode_from_arguments();
+        if (mode == launcher::mode::none)
         {
-            //game::show_error(ex.what());
-            MessageBoxA(nullptr, ex.what(), "cod-mod", MB_ICONINFORMATION);
-            return 1;
+            const launcher launcher;
+            mode = launcher.run();
+            if (mode == launcher::mode::none)
+                return 0;
         }
-    }
-    
-    return static_cast<int>(entry_point());
-}
+        game::environment::set_mode(mode);
+        entry_point = load_binary(mode);
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, int)
-{
-    return main();
+        if (!entry_point)
+            throw std::runtime_error("Unable to load binary into memory");
+        if (!component_loader::post_load())
+            return 0;
+    }
+    catch (std::exception& ex)
+    {
+        MSG_BOX_ERROR(ex.what());
+        return 1;
+    }
+
+    return static_cast<int>(entry_point());
 }

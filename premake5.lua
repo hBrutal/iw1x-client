@@ -244,7 +244,7 @@ filter "configurations:Release"
 	buildoptions {"/GL"}
 	linkoptions {"/IGNORE:4702", "/LTCG"}
 	defines {"NDEBUG"}
-	flags {"FatalCompileWarnings"}
+	fatalwarnings { "All" }
 filter {}
 
 filter "configurations:Debug"
@@ -285,7 +285,7 @@ resincludedirs {"$(ProjectDir)src"}
 
 links {"common"}
 
-prebuildcommands {"pushd %{_MAIN_SCRIPT_DIR}", "premake5 generate-buildinfo", "popd"}
+prebuildcommands {"pushd %{_MAIN_SCRIPT_DIR}", "tools\\premake5 generate-buildinfo", "popd"}
 
 dependencies.imports()
 

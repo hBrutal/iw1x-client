@@ -26,19 +26,31 @@ namespace game_module
 		static utils::nt::library host{};
 		return host;
 	}
-	
+
+
+
+
+
+
+
+
+	// TODO: move to appropriate component
 	void CG_ServerCommand_stub()
 	{
-		//MessageBoxA(nullptr, "CG_ServerCommand_stub", "cod-mod", MB_ICONINFORMATION);
-
-
 		CG_ServerCommand_hook.invoke();
 	}
-
 	void hook_dll_cg_mp()
 	{
 		CG_ServerCommand_hook.create(cgame_mp_offset(0x3002e0d0), CG_ServerCommand_stub);
 	}
+
+
+
+
+
+
+
+
 	
 	HMODULE WINAPI nt_LoadLibraryA_stub(LPCSTR lpLibFileName)
 	{
@@ -50,7 +62,6 @@ namespace game_module
 		if (lpLibFileName != NULL)
 		{
 			auto fileName = PathFindFileNameA(lpLibFileName);
-
 			if (!strcmp(fileName, "cgame_mp_x86.dll"))
 			{
 				cgame_mp = hModule;
@@ -64,8 +75,12 @@ namespace game_module
 
 		return ret;
 	}
-	
-	//// Return original client filename so GPU driver enables its profile, preventing buffer overrun when glGetString(GL_EXTENSIONS) gets called
+
+	/*
+	* Return original client filename, so GPU driver knows what game it is,
+	* so if it has a profile for it, it will get enabled
+	* (this prevents buffer overrun when glGetString(GL_EXTENSIONS) gets called)
+	*/
 	// For AMD and Intel HD Graphics
 	DWORD WINAPI nt_GetModuleFileNameA_stub(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 	{
@@ -75,7 +90,7 @@ namespace game_module
 		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
 		{
 			std::filesystem::path path = lpFilename;
-			auto binary = game::environment::get_binary();
+			auto binary = game::environment::get_client_filename();
 			path.replace_filename(binary);
 			std::string pathStr = path.string();
 			std::copy(pathStr.begin(), pathStr.end(), lpFilename);
@@ -90,23 +105,24 @@ namespace game_module
 		auto* orig = static_cast<decltype(GetModuleFileNameW)*>(nt_GetModuleFileNameW_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 
-		int bufferSize_w_to_s = WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, NULL, 0, NULL, NULL);
-		std::string pathStr(bufferSize_w_to_s - 1, 0);
-		WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, &pathStr[0], bufferSize_w_to_s, NULL, NULL);
+		int required_size = WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, nullptr, 0, nullptr, nullptr);
+		std::string pathStr(required_size - 1, '\0');
+		WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, pathStr.data(), required_size, nullptr, nullptr);
 
 		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
 		{
 			std::filesystem::path pathFs = pathStr;
-			auto binary = game::environment::get_binary();
-			pathFs.replace_filename(binary);
 
-			int bufferSize_s_to_w = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, nullptr, 0);
-			MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, lpFilename, bufferSize_s_to_w);
+			auto client_filename = game::environment::get_client_filename();
+			pathFs.replace_filename(client_filename);
+			pathStr = pathFs.string();
+
+			required_size = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, nullptr, 0);
+			MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, lpFilename, required_size);
 		}
 
 		return ret;
 	}
-	////
 	
 	class component final : public component_interface
 	{
@@ -125,7 +141,6 @@ namespace game_module
 			nt_LoadLibraryA_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibraryA_stub);
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
 			nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
-
 		}
 	};
 }

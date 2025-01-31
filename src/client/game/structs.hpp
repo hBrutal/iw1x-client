@@ -8,7 +8,7 @@ namespace game
 		qtrue
 	};
 
-	enum CvarFlags : std::uint32_t
+	enum CvarFlags
 	{
 		CVAR_FLAG_NONE = 0,
 		CVAR_FLAG_ARCHIVE = 0x1,
