@@ -41,18 +41,7 @@ namespace imgui
 		draw_menu();
 		end_frame();
 	}
-	
-	void shutdown()
-	{
-		if (initialized)
-		{
-			ImGui_ImplOpenGL2_Shutdown();
-			ImGui_ImplWin32_Shutdown();
-			ImGui::DestroyContext();
-			initialized = false;
-		}
-	}
-		
+
 	void init(HDC hdc)
 	{
 		hWnd_during_init = *game::hWnd;
@@ -64,6 +53,17 @@ namespace imgui
 		ImGui_ImplOpenGL2_Init();
 
 		initialized = true;
+	}
+
+	void shutdown()
+	{
+		if (initialized)
+		{
+			ImGui_ImplOpenGL2_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+			initialized = false;
+		}
 	}
 	
 	BOOL WINAPI SwapBuffers_stub(HDC hdc)

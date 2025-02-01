@@ -1,6 +1,6 @@
 #pragma once
 
-#define BINARY_PAYLOAD_SIZE 0x0B500000
+#define BINARY_PAYLOAD_SIZE 0x0B500000 // TODO: find the proper size
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -8,7 +8,6 @@
 #include <MsHTML.h>
 #include <MsHtmHst.h>
 #include <shellapi.h>
-#include <csetjmp>
 #include <ShlObj.h>
 #include <atlbase.h>
 #include <dwmapi.h>
@@ -30,7 +29,7 @@
 #define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONERROR);
 
 #include <cassert>
-#include <chrono>
+#include <cstring>
 #include <filesystem>
 #include <mutex>
 #include <queue>
@@ -38,6 +37,7 @@
 #include <string>
 
 #include <gsl/gsl>
+
 #include <MinHook.h>
 #include <imgui.h>
 #include <backends/imgui_impl_opengl2.h>
