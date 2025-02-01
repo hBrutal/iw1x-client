@@ -90,7 +90,7 @@ namespace fps_ping
 
 			perf_calc_fps(&cg_perf, cg_perf.frame_ms);
 
-			utils::hook::invoke<void>(SELECT_VALUE(0, 0x14062C540));
+			utils::hook::invoke<void>(SP_OR_MP(0, 0x14062C540));
 		}
 
 		void cg_draw_fps()
@@ -163,7 +163,7 @@ namespace fps_ping
 
 			// fps setup
 			cg_perf.perf_start = std::chrono::high_resolution_clock::now();
-			utils::hook::call(SELECT_VALUE(0, 0x140213B27), &perf_update);
+			utils::hook::call(SP_OR_MP(0, 0x140213B27), &perf_update);
 
 			// fix ping value
 			//utils::hook::nop(0x140213031, 2);

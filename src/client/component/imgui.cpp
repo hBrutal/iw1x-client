@@ -98,7 +98,7 @@ namespace imgui
 	class component final : public component_interface
 	{
 	public:
-		void* load_import(const std::string& library, const std::string& function) override
+		void* load_import(const std::string&, const std::string& function) override
 		{
 			if (function == "SwapBuffers" && (!game::environment::is_dedi() && !game::environment::is_sp()))
 			{

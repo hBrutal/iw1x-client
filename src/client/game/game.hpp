@@ -3,10 +3,10 @@
 #include "structs.hpp"
 #include "launcher/launcher.hpp"
 
-#define SELECT_VALUE(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
+#define SP_OR_MP(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
 
-#define cgame_mp_absolute(relative) (address_cgame_mp + (relative - 0x30000000))
-#define ui_mp_absolute(relative) (address_ui_mp + (relative - 0x40000000))
+#define ABSOLUTE_CGAME_MP(relative) (address_cgame_mp + (relative - 0x30000000))
+#define ABSOLUTE_UI_MP(relative) (address_ui_mp + (relative - 0x40000000))
 
 extern DWORD address_cgame_mp;
 extern DWORD address_ui_mp;

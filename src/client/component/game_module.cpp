@@ -41,7 +41,7 @@ namespace game_module
 	}
 	void hook_dll_cg_mp()
 	{
-		CG_ServerCommand_hook.create(cgame_mp_absolute(0x3002e0d0), CG_ServerCommand_stub);
+		CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), CG_ServerCommand_stub);
 	}
 
 
