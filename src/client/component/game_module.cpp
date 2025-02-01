@@ -1,12 +1,12 @@
 #include <std_include.hpp>
-#include "game/game.hpp"
+#include <utils/hook.hpp>
 #include "loader/component_loader.hpp"
+#include "game/game.hpp"
+
 #include "game_module.hpp"
 
-#include <utils/hook.hpp>
-
-DWORD cgame_mp;
-DWORD ui_mp;
+DWORD address_cgame_mp;
+DWORD address_ui_mp;
 
 namespace game_module
 {
@@ -41,7 +41,7 @@ namespace game_module
 	}
 	void hook_dll_cg_mp()
 	{
-		CG_ServerCommand_hook.create(cgame_mp_offset(0x3002e0d0), CG_ServerCommand_stub);
+		CG_ServerCommand_hook.create(cgame_mp_absolute(0x3002e0d0), CG_ServerCommand_stub);
 	}
 
 
@@ -57,19 +57,19 @@ namespace game_module
 		auto* orig = static_cast<decltype(LoadLibraryA)*>(nt_LoadLibraryA_hook.get_original());
 		auto ret = orig(lpLibFileName);
 
-		auto hModule = (DWORD)GetModuleHandleA(lpLibFileName);
+		auto hModule_address = (DWORD)GetModuleHandleA(lpLibFileName);
 
 		if (lpLibFileName != NULL)
 		{
 			auto fileName = PathFindFileNameA(lpLibFileName);
 			if (!strcmp(fileName, "cgame_mp_x86.dll"))
 			{
-				cgame_mp = hModule;
+				address_cgame_mp = hModule_address;
 				hook_dll_cg_mp();
 			}
 			else if (!strcmp(fileName, "ui_mp_x86.dll"))
 			{
-				ui_mp = hModule;
+				address_ui_mp = hModule_address;
 			}
 		}
 

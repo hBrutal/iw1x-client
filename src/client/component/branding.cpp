@@ -4,9 +4,6 @@
 
 #include "scheduler.hpp"
 
-#include <utils/hook.hpp>
-#include <utils/string.hpp>
-
 namespace branding
 {
 	class component final : public component_interface
@@ -26,7 +23,7 @@ namespace branding
 				const auto font = 1;
 				const auto scale = 0.20f;
 				float color[4] = { 0.666f, 0.666f, 0.666f, 0.666f };
-				const auto* text = "cod-mod";
+				const auto* text = MOD_NAME;
 				
 				game::SCR_DrawString(x, y, font, scale, color, text, NULL, NULL, NULL);
 

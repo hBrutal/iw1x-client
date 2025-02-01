@@ -23,9 +23,11 @@
 #undef min
 #endif
 
-#define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, "", MB_ICONINFORMATION);
-#define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, "", MB_ICONWARNING);
-#define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, "Error", MB_ICONERROR);
+#define MOD_NAME "cod-mod"
+
+#define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONINFORMATION);
+#define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONWARNING);
+#define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONERROR);
 
 #include <cassert>
 #include <chrono>

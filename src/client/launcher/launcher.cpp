@@ -46,7 +46,7 @@ void launcher::create_main_menu()
 			return DefWindowProcA(*window, message, w_param, l_param);
 		});
 
-	this->main_window_.create("cod-mod", 750, 420);
+	this->main_window_.create(MOD_NAME, 750, 420);
 	this->main_window_.load_html(load_content(MENU_MAIN));
 	this->main_window_.show();
 }

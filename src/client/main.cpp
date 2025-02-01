@@ -1,9 +1,8 @@
 #include <std_include.hpp>
-#include "launcher/launcher.hpp"
-#include "loader/loader.hpp"
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
-
+#include "launcher/launcher.hpp"
+#include "loader/loader.hpp"
 #include <utils/flags.hpp>
 #include <utils/io.hpp>
 #include <utils/string.hpp>
@@ -84,7 +83,6 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
 
 [[noreturn]] void WINAPI exit_hook(const int code)
 {
-
     component_loader::pre_destroy();
     std::exit(code);
 }
@@ -125,7 +123,7 @@ launcher::mode detect_mode_from_arguments()
     return launcher::mode::none;
 }
 
-FARPROC load_binary(const launcher::mode mode)
+FARPROC load_binary()
 {
     loader loader;
     utils::nt::library self;
@@ -180,7 +178,7 @@ void enable_dpi_awareness()
         set_dpi(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 }
 
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
+int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
     AddVectoredExceptionHandler(0, exception_handler);
     SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
@@ -199,7 +197,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     try
     {
         if (!component_loader::post_start())
-            return 0;
+            return 1;
 
         auto mode = detect_mode_from_arguments();
         if (mode == launcher::mode::none)
@@ -207,15 +205,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
             const launcher launcher;
             mode = launcher.run();
             if (mode == launcher::mode::none)
-                return 0;
+                return 1;
+            game::environment::set_mode(mode);
         }
-        game::environment::set_mode(mode);
-        entry_point = load_binary(mode);
+        entry_point = load_binary();
 
         if (!entry_point)
             throw std::runtime_error("Unable to load binary into memory");
         if (!component_loader::post_load())
-            return 0;
+            return 1;
     }
     catch (std::exception& ex)
     {
