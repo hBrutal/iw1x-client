@@ -1,2 +1,0 @@
-# Prevents Base64 encoded images from filling language bar on repo webpage
-src/client/resources/main.html linguist-detectable=false
