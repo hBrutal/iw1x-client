@@ -5,6 +5,16 @@
 
 namespace game
 {
+	int Cmd_Argc()
+	{
+		return *cmd_argc;
+	}
+	
+	char* Cmd_Argv(int arg)
+	{
+		return cmd_argv[arg];
+	}
+	
 	namespace environment
 	{
 		launcher::mode mode = launcher::mode::none;

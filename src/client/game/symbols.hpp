@@ -16,19 +16,16 @@ namespace game
 	WEAK symbol<cvar_t* (const char* name, const char* value)> Cvar_Set{ 0, 0x00439650 };
 	WEAK symbol<int ()> Sys_Milliseconds{ 0, 0x004659d0 };
 	WEAK symbol<LRESULT CALLBACK (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)> MainWndProc{ 0, 0x466BE0 };
-	WEAK symbol<void()> IN_DeactivateMouse{ 0, 0x4616b0 };
-	WEAK symbol<void()> IN_ActivateMouse{ 0, 0x461730 };
+	WEAK symbol<void ()> IN_DeactivateMouse{ 0, 0x4616b0 };
+	WEAK symbol<void ()> IN_ActivateMouse{ 0, 0x461730 };
+	WEAK symbol<void (const char* msg, ...)> Com_Printf{ 0, 0x004357b0 };
+	WEAK symbol<void ()> CG_ServerCommand{ 0, 0x3002e0d0, OFFSET_CGAME_MP };
 
 
-	
 
 
-	
 
-	
-	
-	
-	
+
 	/***************************************************************
 	 * Variables
 	 **************************************************************/
@@ -36,6 +33,9 @@ namespace game
 	WEAK symbol<int> keyCatchers{ 0, 0x0155f2c4 };
 	WEAK symbol<int> ping{ 0, 0x41405d };
 	WEAK symbol<HWND> hWnd{ 0, 0x16C35E8 };
+	WEAK symbol<int> cmd_argc{ 0, 0x008930f0 };
+	WEAK symbol<char*> cmd_argv{ 0, 0x00890bf0 };
+
 
 
 

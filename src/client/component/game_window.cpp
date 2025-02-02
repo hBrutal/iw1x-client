@@ -16,6 +16,9 @@ namespace game_window
 		
 		switch (uMsg)
 		{
+		case WM_CREATE:
+			SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) | WS_MINIMIZEBOX); // Adds minimize button and Win+M support
+			break;
 		case WM_KEYDOWN:
 			if (wParam == VK_HOME)
 			{

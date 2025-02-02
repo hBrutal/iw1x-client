@@ -5,6 +5,8 @@
 
 #include "game_module.hpp"
 
+#include "protection.hpp"
+
 DWORD address_cgame_mp;
 DWORD address_ui_mp;
 
@@ -13,7 +15,6 @@ namespace game_module
 	utils::hook::detour nt_LoadLibraryA_hook;
 	utils::hook::detour nt_GetModuleFileNameA_hook;
 	utils::hook::detour nt_GetModuleFileNameW_hook;
-	utils::hook::detour CG_ServerCommand_hook;
 
 	utils::nt::library get_client_module()
 	{
@@ -26,31 +27,11 @@ namespace game_module
 		static utils::nt::library host{};
 		return host;
 	}
-
-
-
-
-
-
-
-
-	// TODO: move to appropriate component
-	void CG_ServerCommand_stub()
-	{
-		CG_ServerCommand_hook.invoke();
-	}
+	
 	void hook_dll_cg_mp()
 	{
-		CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), CG_ServerCommand_stub);
+		protection::CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), protection::CG_ServerCommand_stub);
 	}
-
-
-
-
-
-
-
-
 	
 	HMODULE WINAPI nt_LoadLibraryA_stub(LPCSTR lpLibFileName)
 	{
