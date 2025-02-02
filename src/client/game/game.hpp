@@ -1,6 +1,6 @@
 #pragma once
 
-#include "structs.hpp"
+#include "types.hpp"
 #include "launcher/launcher.hpp"
 
 extern DWORD address_cgame_mp;
@@ -80,4 +80,5 @@ namespace game
 	char* Cmd_Argv(int arg);
 }
 
-#include "symbols.hpp"
+#include "variables.hpp"
+#include "functions.hpp"

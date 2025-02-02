@@ -71,7 +71,6 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
         sprintf_s(buf, "An exception 0x%08X occurred at location 0x%p\n",
             exception_info->ExceptionRecord->ExceptionCode,
             exception_info->ExceptionRecord->ExceptionAddress);
-        //game::show_error(buf);
         MSG_BOX_ERROR(buf);
     }
 

@@ -2,19 +2,13 @@
 
 namespace game
 {
-	enum qboolean
-	{
-		qfalse,
-		qtrue
-	};
-
-	enum CvarFlags
-	{
-		CVAR_FLAG_NONE = 0,
-		CVAR_FLAG_ARCHIVE = 0x1,
-	};
+#define YAW 1
 	
-	struct cvar_t
+	typedef unsigned char byte;
+	typedef enum { qfalse, qtrue } qboolean;
+	typedef void (*xcommand_t)(void);
+	
+	typedef struct cvar_s
 	{
 		char* name;
 		char* string;
@@ -27,5 +21,5 @@ namespace game
 		int integer;
 		struct cvar_s* next;
 		struct cvar_s* hashNext;
-	};
+	} cvar_t;
 }

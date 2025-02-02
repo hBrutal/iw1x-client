@@ -4,10 +4,6 @@
 
 namespace game
 {
-	/***************************************************************
-	 * Functions
-	 **************************************************************/
-
 	WEAK symbol<void ()> Com_Frame{ 0, 0x00437f40 };
 	WEAK symbol<void (int msec)> SV_Frame{ 0, 0x0045b1d0 };
 	WEAK symbol<void (float x, float y, int font, float scale, float* color, const char* text, float spacing, int limit, int flags)> SCR_DrawString{ 0x0, 0x4DF570 };
@@ -20,23 +16,7 @@ namespace game
 	WEAK symbol<void ()> IN_ActivateMouse{ 0, 0x461730 };
 	WEAK symbol<void (const char* msg, ...)> Com_Printf{ 0, 0x004357b0 };
 	WEAK symbol<void ()> CG_ServerCommand{ 0, 0x3002e0d0, OFFSET_CGAME_MP };
-
-
-
-
-
-
-	/***************************************************************
-	 * Variables
-	 **************************************************************/
-
-	WEAK symbol<int> keyCatchers{ 0, 0x0155f2c4 };
-	WEAK symbol<int> ping{ 0, 0x41405d };
-	WEAK symbol<HWND> hWnd{ 0, 0x16C35E8 };
-	WEAK symbol<int> cmd_argc{ 0, 0x008930f0 };
-	WEAK symbol<char*> cmd_argv{ 0, 0x00890bf0 };
-
-
+	WEAK symbol<void (const char* cmd_name, xcommand_t function)> Cmd_AddCommand{ 0, 0x00428840 };
 
 
 

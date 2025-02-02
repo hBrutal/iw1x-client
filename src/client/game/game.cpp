@@ -84,22 +84,4 @@ namespace game
 			mohaa = true;
 		}
 	}
-
-	bool is_headless()
-	{
-		static const auto headless = utils::flags::has_flag("headless");
-		return headless;
-	}
-
-	void show_error(const std::string& text, const std::string& title)
-	{
-		if (is_headless())
-		{
-			puts(text.data());
-		}
-		else
-		{
-			MessageBoxA(nullptr, text.data(), title.data(), MB_ICONERROR | MB_SETFOREGROUND | MB_TOPMOST);
-		}
-	}
 }
