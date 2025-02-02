@@ -178,7 +178,24 @@ namespace utils::hook
     {
         return jump(pointer, reinterpret_cast<void*>(data));
     }
+    
+    void* assemble(const std::function<void(assembler&)>& asm_function)
+    {
+        static asmjit::JitRuntime runtime;
 
+        asmjit::CodeHolder code;
+        code.init(runtime.environment());
+
+        assembler a(&code);
+
+        asm_function(a);
+
+        void* result = nullptr;
+        runtime.add(&result, &code);
+
+        return result;
+    }
+    
     void inject(void* pointer, const void* data)
     {
         set<int32_t>(pointer, int32_t(size_t(data) - (size_t(pointer) + 4)));

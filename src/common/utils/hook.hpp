@@ -104,6 +104,8 @@ namespace utils::hook
     void jump(size_t pointer, void* data);
     void jump(size_t pointer, size_t data);
 
+    void* assemble(const std::function<void(assembler&)>& asm_function);
+
     void inject(void* pointer, const void* data);
     void inject(size_t pointer, const void* data);
 
