@@ -15,6 +15,8 @@ namespace protection
 		"cg_norender",
 		"cl_allowDownload",
 		"cl_avidemo",
+		"cl_updateavailable",
+		"cl_updatefiles",
 		"m_pitch",
 		"m_yaw",
 		"name",
