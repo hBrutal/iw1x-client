@@ -6,6 +6,7 @@
 #include "game_module.hpp"
 
 #include "protection.hpp"
+#include "movement.hpp"
 
 DWORD address_cgame_mp;
 DWORD address_ui_mp;
@@ -28,8 +29,10 @@ namespace game_module
 		return host;
 	}
 	
-	void hook_dll_cg_mp()
+	void hook_dll_cgame_mp()
 	{
+		movement::ready_hook_cgame_mp();
+
 		protection::CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), protection::CG_ServerCommand_stub);
 	}
 	
@@ -46,7 +49,7 @@ namespace game_module
 			if (!strcmp(fileName, "cgame_mp_x86.dll"))
 			{
 				address_cgame_mp = hModule_address;
-				hook_dll_cg_mp();
+				hook_dll_cgame_mp();
 			}
 			else if (!strcmp(fileName, "ui_mp_x86.dll"))
 			{

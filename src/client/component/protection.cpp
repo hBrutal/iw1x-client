@@ -50,6 +50,26 @@ namespace protection
 			return;
 		game::Cvar_Set(name, value);
 	}
+
+
+
+
+
+
+
+
+	/*void __fastcall CL_SystemInfoChanged_FS_PureServerSetReferencedPaks_stub(const char* pakNames)
+	{
+		OutputDebugString(pakNames);
+		OutputDebugString("\n");
+
+
+		game::FS_PureServerSetReferencedPaks(pakNames);
+	}*/
+
+
+
+
 	
 	class component final : public component_interface
 	{
@@ -60,6 +80,21 @@ namespace protection
 				return;
 			
 			utils::hook::call(0x00415ffe, CL_SystemInfoChanged_Cvar_Set_stub);
+			
+			
+
+
+
+			//utils::hook::call(0x00415f4b, CL_SystemInfoChanged_FS_PureServerSetLoadedPaks_stub);
+			//utils::hook::call(0x00415f71, CL_SystemInfoChanged_FS_PureServerSetReferencedPaks_stub);
+
+
+
+
+
+
+
+
 		}
 	};
 }

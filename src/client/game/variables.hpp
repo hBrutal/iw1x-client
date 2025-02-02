@@ -10,6 +10,10 @@ namespace game
 	WEAK symbol<int> cmd_argc{ 0, 0x008930f0 };
 	WEAK symbol<char*> cmd_argv{ 0, 0x00890bf0 };
 	WEAK symbol<float> viewangles{ 0, 0x0143a9a0 };
+	WEAK symbol<float> cg_zoomSensitivity{ 0, 0x3020b5f4, OFFSET_CGAME_MP };
+	WEAK symbol<float> ads_progress{ 0, 0x30207214, OFFSET_CGAME_MP }; // Between 0 and 1
+	WEAK symbol<float> fov_visible{ 0, 0x3020958c, OFFSET_CGAME_MP }; // Not the cg_fov cvar value
+	WEAK symbol<float> cg_fov_cvar_value{ 0, 0x30298c68, OFFSET_CGAME_MP };
 
 
 

@@ -20,5 +20,9 @@ namespace game
 
 
 
+	/*WEAK symbol<void(const char* pakSums, const char* pakNames)> FS_PureServerSetLoadedPaks{ 0, 0x0043c290 };
+	WEAK symbol <void(const char* pakNames)> __fastcall FS_PureServerSetReferencedPaks{ 0, 0x0043c530 };*/
+
+
 
 }
