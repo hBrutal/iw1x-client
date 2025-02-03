@@ -8,8 +8,9 @@
 namespace protection
 {
 	utils::hook::detour CG_ServerCommand_hook;
+	utils::hook::detour CL_SystemInfoChanged_hook;
 	
-	std::vector<std::string> writeProtectedCvars =
+	std::vector<std::string> writeProtectedCvars = // TODO: maybe use a whitelist instead
 	{
 		"activeAction",
 		"cg_norender",
@@ -22,6 +23,10 @@ namespace protection
 		"name",
 		"r_showImages",
 		"sensitivity",
+		"com_maxfps",
+		"rate",
+		"snaps",
+		"com_maxpackets"
 	};
 
 	bool cvarIsWriteProtected(const char* cvar_name)
@@ -50,31 +55,37 @@ namespace protection
 			return;
 		game::Cvar_Set(name, value);
 	}
-
-
-
-
-
-
-
-
-	/*void __fastcall CL_SystemInfoChanged_FS_PureServerSetReferencedPaks_stub(const char* pakNames)
+	
+	const char* Info_ValueForKey(const char* buffer, const char* key)
 	{
-		OutputDebugString(pakNames);
-		OutputDebugString("\n");
+		_asm
+		{
+			mov ebx, key
+			mov ecx, buffer
 
+			mov eax, 0x0044ada0
+			call eax
+		}
+	}
+	
+#define NON_PK3_PROTECTION_MESSAGE "Non-pk3 download protection triggered"
+	void CL_SystemInfoChanged_stub()
+	{
+		char* cl_gameState_stringData = (char*)0x01436a7c;
+		int* cl_gameState_stringOffsets = (int*)0x01434a80;
+		char* systemInfo = cl_gameState_stringData + cl_gameState_stringOffsets[0];
+		const char* sv_pakNames = Info_ValueForKey(systemInfo, "sv_pakNames");
+		const char* sv_referencedPakNames = Info_ValueForKey(systemInfo, "sv_referencedPakNames");
+		
+		if (strstr(sv_pakNames, "@") || strstr(sv_referencedPakNames, "@"))
+			game::Com_Error(game::ERR_DROP, NON_PK3_PROTECTION_MESSAGE);
 
-		game::FS_PureServerSetReferencedPaks(pakNames);
-	}*/
-
-
-
-
-
-
-
+		CL_SystemInfoChanged_hook.invoke();
+	}
+	
 	void ready_hook_cgame_mp()
 	{
+		// Use a cvar blacklist for setClientCvar GSC method
 		CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), CG_ServerCommand_stub);
 	}
 	
@@ -86,20 +97,11 @@ namespace protection
 			if (game::environment::is_dedi())
 				return;
 			
+			// Use a cvar blacklist for CL_SystemInfoChanged
 			utils::hook::call(0x00415ffe, CL_SystemInfoChanged_Cvar_Set_stub);
 			
-			
-
-
-
-			//utils::hook::call(0x00415f4b, CL_SystemInfoChanged_FS_PureServerSetLoadedPaks_stub);
-			//utils::hook::call(0x00415f71, CL_SystemInfoChanged_FS_PureServerSetReferencedPaks_stub);
-
-
-
-
-
-
+			// Check in sv_pakNames and sv_referencedPakNames for an indicator of a non-pk3 file incoming download
+			CL_SystemInfoChanged_hook.create(0x00415eb0, CL_SystemInfoChanged_stub);
 		}
 	};
 }

@@ -44,4 +44,15 @@ namespace game
 		char* adsOverlayShader;	// 0x224
 		// ...
 	} weaponInfo_t;
+
+	typedef enum
+	{
+		ERR_FATAL,
+		ERR_DROP,
+		// ...
+	} errorParm_t;
+
+
+
+
 }

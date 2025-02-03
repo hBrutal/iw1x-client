@@ -17,13 +17,10 @@ namespace game
 	WEAK symbol<void (const char* msg, ...)> Com_Printf{ 0, 0x004357b0 };
 	WEAK symbol<void ()> CG_ServerCommand{ 0, 0x3002e0d0, OFFSET_CGAME_MP };
 	WEAK symbol<void (const char* cmd_name, xcommand_t function)> Cmd_AddCommand{ 0, 0x00428840 };
+	WEAK symbol<void (int code, const char* fmt, ...)> Com_Error{ 0, 0x00435ad0 };
 
 
 
-
-
-	/*WEAK symbol<void(const char* pakSums, const char* pakNames)> FS_PureServerSetLoadedPaks{ 0, 0x0043c290 };
-	WEAK symbol <void(const char* pakNames)> __fastcall FS_PureServerSetReferencedPaks{ 0, 0x0043c530 };*/
 
 
 

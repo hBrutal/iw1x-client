@@ -18,11 +18,11 @@ namespace branding
 
 			scheduler::loop([]()
 			{
-				const auto x = 1;
+				const auto x = 2;
 				const auto y = 10;
 				const auto font = 1;
-				const auto scale = 0.20f;
-				float color[4] = { 0.666f, 0.666f, 0.666f, 0.666f };
+				const auto scale = 0.21f;
+				float color[4] = { 0.28f, 0.01f, 1.f, 0.75f };
 				const auto* text = MOD_NAME;
 				
 				game::SCR_DrawString(x, y, font, scale, color, text, NULL, NULL, NULL);

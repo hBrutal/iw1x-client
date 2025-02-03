@@ -86,7 +86,7 @@ namespace fixes
 				return;
 			}
 
-			// Prevents inserting the char of the console key into the text field
+			// Prevents inserting the char of the console key in the text field
 			utils::hook::jump(SP_OR_MP(0, 0x40CB1E), Field_CharEvent_ignore_console_char_stub);
 		}
 	};
