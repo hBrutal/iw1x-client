@@ -30,8 +30,9 @@ namespace fixes
 	
 	void UI_StartServerRefresh_stub(game::qboolean full)
 	{
-		if (!*game::refreshActive)
-			UI_StartServerRefresh_hook.invoke(full);
+		if (*game::refreshActive)
+			return;
+		UI_StartServerRefresh_hook.invoke(full);
 	}
 	
 	void ready_hook_ui_mp()
