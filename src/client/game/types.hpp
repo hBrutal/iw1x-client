@@ -1,12 +1,11 @@
 #pragma once
 
-namespace game
-{
 #define CVAR_ARCHIVE 1
 #define MAX_WEAPONS 64
 #define YAW 1
 
-	
+namespace game
+{
 	typedef unsigned char byte;
 	typedef enum { qfalse, qtrue } qboolean;
 	typedef void (*xcommand_t)(void);
