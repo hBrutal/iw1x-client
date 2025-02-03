@@ -6,6 +6,7 @@
 #include "game_module.hpp"
 
 #include "protection.hpp"
+#include "fixes.hpp"
 #include "movement.hpp"
 
 DWORD address_cgame_mp;
@@ -34,6 +35,11 @@ namespace game_module
 		protection::ready_hook_cgame_mp();
 		movement::ready_hook_cgame_mp();
 	}
+
+	void hook_dll_ui_mp()
+	{
+		fixes::ready_hook_ui_mp();
+	}
 	
 	HMODULE WINAPI nt_LoadLibraryA_stub(LPCSTR lpLibFileName)
 	{
@@ -53,6 +59,7 @@ namespace game_module
 			else if (!strcmp(fileName, "ui_mp_x86.dll"))
 			{
 				address_ui_mp = hModule_address;
+				hook_dll_ui_mp();
 			}
 		}
 

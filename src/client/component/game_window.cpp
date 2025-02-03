@@ -79,7 +79,7 @@ namespace game_window
 				return;
 
 			utils::hook::set(0x4639b9 + 1, MainWndProc_stub);
-			utils::hook::set(0x5083b1, 0x00); // Alt+Tab support
+			utils::hook::set(0x5083b1, 0x00); // Alt+Tab support, see https://github.com/xtnded/codextended-client/pull/1
 		}
 	};
 }

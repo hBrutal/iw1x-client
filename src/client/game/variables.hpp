@@ -16,6 +16,7 @@ namespace game
 	WEAK symbol<float> cg_fov_cvar_value{ 0, 0x30298c68, OFFSET_CGAME_MP };
 	WEAK symbol<pmove_t*> pm{ 0, 0x3019d570, OFFSET_CGAME_MP };
 	WEAK symbol<weaponInfo_t[MAX_WEAPONS]> cg_weapons{ 0, 0x300eef3c, OFFSET_CGAME_MP };
+	WEAK symbol<qboolean> refreshActive{ 0, 0x401EA698, OFFSET_UI_MP };
 
 
 

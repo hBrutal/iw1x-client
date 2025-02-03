@@ -69,6 +69,10 @@ namespace protection
 
 
 
+
+
+
+
 	void ready_hook_cgame_mp()
 	{
 		CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), CG_ServerCommand_stub);
@@ -90,8 +94,6 @@ namespace protection
 
 			//utils::hook::call(0x00415f4b, CL_SystemInfoChanged_FS_PureServerSetLoadedPaks_stub);
 			//utils::hook::call(0x00415f71, CL_SystemInfoChanged_FS_PureServerSetReferencedPaks_stub);
-
-
 
 
 
