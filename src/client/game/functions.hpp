@@ -16,8 +16,7 @@ namespace game
 	WEAK symbol<void ()> IN_ActivateMouse{ 0, 0x461730 };
 	WEAK symbol<void (const char* msg, ...)> Com_Printf{ 0, 0x004357b0 };
 	WEAK symbol<void ()> CG_ServerCommand{ 0, 0x3002e0d0, OFFSET_CGAME_MP };
-	WEAK symbol<void(const char* cmd_name, xcommand_t function)> Cmd_AddCommand{ 0, 0x00428840 };
-
+	WEAK symbol<void (const char* cmd_name, xcommand_t function)> Cmd_AddCommand{ 0, 0x00428840 };
 
 
 

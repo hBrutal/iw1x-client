@@ -1,5 +1,6 @@
 #pragma once
 
+#define MAX_STRING_CHARS 1024
 #define CVAR_ARCHIVE 1
 #define MAX_WEAPONS 64
 #define YAW 1

@@ -113,12 +113,7 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 					}
 				}
 			}
-
-			/*std::ostringstream oss;
-			oss << "######" << function_name.data() << "\n";
-			std::string result = oss.str();
-			OutputDebugString(result.c_str());*/
-
+			
 			if (!function)
 			{
 				throw std::runtime_error(utils::string::va("Unable to load import '%s' from library '%s'", function_name.data(), name.data()));
