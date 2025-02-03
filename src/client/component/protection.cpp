@@ -69,7 +69,10 @@ namespace protection
 
 
 
-
+	void ready_hook_cgame_mp()
+	{
+		CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), CG_ServerCommand_stub);
+	}
 	
 	class component final : public component_interface
 	{

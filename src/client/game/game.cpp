@@ -15,6 +15,12 @@ namespace game
 		return cmd_argv[arg];
 	}
 	
+	game::weaponInfo_t* BG_GetInfoForWeapon(int weaponNum)
+	{
+		auto cg_weapons_ptr = *reinterpret_cast<uintptr_t*>(*game::cg_weapons);
+		return reinterpret_cast<game::weaponInfo_t**>(cg_weapons_ptr)[weaponNum];
+	}
+	
 	namespace environment
 	{
 		launcher::mode mode = launcher::mode::none;

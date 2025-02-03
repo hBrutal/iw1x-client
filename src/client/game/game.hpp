@@ -78,6 +78,8 @@ namespace game
 	
 	int Cmd_Argc();
 	char* Cmd_Argv(int arg);
+	
+	game::weaponInfo_t* BG_GetInfoForWeapon(int weaponNum);
 }
 
 #include "variables.hpp"

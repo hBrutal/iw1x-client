@@ -1,8 +1,10 @@
 #include <std_include.hpp>
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
-
+#include <utils/string.hpp>
 #include "imgui.hpp"
+
+#include "movement.hpp"
 
 namespace imgui
 {
@@ -11,6 +13,11 @@ namespace imgui
 	bool waitForMenuKeyRelease = false;
 	HGLRC imguiWglContext;
 	HWND hWnd_during_init;
+
+	bool sensitivity_adsScaleEnable = false;
+	float sensitivity_adsScale = 0.0f;
+	bool sensitivity_adsScaleSniperEnable = false;
+	float sensitivity_adsScaleSniper = 0.0f;
 	
 	void new_frame()
 	{
@@ -19,13 +26,54 @@ namespace imgui
 		ImGui::NewFrame();
 	}
 	
+	void menu_loads_settings()
+	{
+		sensitivity_adsScaleEnable = movement::sensitivity_adsScaleEnable->integer;
+		sensitivity_adsScale = movement::sensitivity_adsScale->value;
+		sensitivity_adsScaleSniperEnable = movement::sensitivity_adsScaleSniperEnable->value;
+		sensitivity_adsScaleSniper = movement::sensitivity_adsScaleSniper->value;
+	}
+	
 	void draw_menu()
 	{
-		ImGui::SetNextWindowSize(ImVec2(100, 100));
-		ImGui::SetNextWindowPos(ImVec2(50, 150), ImGuiCond_FirstUseEver);
+		menu_loads_settings();
+
+		ImGui::SetNextWindowSize(ImVec2(300, 0));
+		ImGui::SetNextWindowPos(ImVec2(50, 200), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowFocus();
 		ImGui::Begin(MOD_NAME, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+		// Sensitivity multiplier
+		ImGui::SeparatorText("Aim Down Sight");
+		ImGui::Checkbox("Sensitivity multiplier", &sensitivity_adsScaleEnable);
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		if (!sensitivity_adsScaleEnable)
+			ImGui::BeginDisabled();
+		ImGui::SliderFloat("##slider_sensitivity_adsScale", &sensitivity_adsScale, 0.15f, 1.30f, "%.2f");
+		if (!sensitivity_adsScaleEnable)
+			ImGui::EndDisabled();
+
+		ImGui::Spacing();
+
+		// Sensitivity sniper multiplier
+		ImGui::Checkbox("Sensitivity sniper multiplier", &sensitivity_adsScaleSniperEnable);
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		if (!sensitivity_adsScaleSniperEnable)
+			ImGui::BeginDisabled();
+		ImGui::SliderFloat("##slider_sensitivity_adsScaleSniper", &sensitivity_adsScaleSniper, 0.15f, 1.30f, "%.2f");
+		if (!sensitivity_adsScaleSniperEnable)
+			ImGui::EndDisabled();
+
 		ImGui::End();
+		menu_updates_settings();
+	}
+
+	void menu_updates_settings()
+	{
+		game::Cvar_Set(movement::sensitivity_adsScaleEnable->name, sensitivity_adsScaleEnable ? "1" : "0");
+		game::Cvar_Set(movement::sensitivity_adsScale->name, utils::string::va("%.2f", sensitivity_adsScale));
+		game::Cvar_Set(movement::sensitivity_adsScaleSniperEnable->name, sensitivity_adsScaleSniperEnable ? "1" : "0");
+		game::Cvar_Set(movement::sensitivity_adsScaleSniper->name, utils::string::va("%.2f", sensitivity_adsScaleSniper));
 	}
 
 	void end_frame()

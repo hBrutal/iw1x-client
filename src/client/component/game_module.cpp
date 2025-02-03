@@ -31,9 +31,8 @@ namespace game_module
 	
 	void hook_dll_cgame_mp()
 	{
+		protection::ready_hook_cgame_mp();
 		movement::ready_hook_cgame_mp();
-
-		protection::CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), protection::CG_ServerCommand_stub);
 	}
 	
 	HMODULE WINAPI nt_LoadLibraryA_stub(LPCSTR lpLibFileName)

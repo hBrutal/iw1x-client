@@ -5,30 +5,42 @@
 
 namespace movement
 {
+	game::cvar_t* sensitivity_adsScaleEnable;
+	game::cvar_t* sensitivity_adsScale;
+	game::cvar_t* sensitivity_adsScaleSniperEnable;
+	game::cvar_t* sensitivity_adsScaleSniper;
+	
 	void Cmd_LookBack()
 	{
 		game::viewangles[YAW] += 180;
 	}
 	
-	float stockCgZoomSensitivity()
+	float originalCgZoomSensitivity()
 	{
-		float* fov_visible_percentage = (float*)ABSOLUTE_CGAME_MP(0x3020958c);
 		return *game::fov_visible / *game::cg_fov_cvar_value; // See 30032fe8
 	}
-
+	
 	float scaledCgZoomSensitivity()
 	{
+		bool weaponIsSniper = false;
+		
+		int weapon = (*game::pm)->ps->weapon;
+		game::weaponInfo_t* weaponInfo = game::BG_GetInfoForWeapon(weapon);
 
-
-
-
-
-		return stockCgZoomSensitivity() * 10;
-
-
-
-
-
+		if (*weaponInfo->adsOverlayShader)
+			weaponIsSniper = true;
+		
+		if (weaponIsSniper)
+		{
+			if (sensitivity_adsScaleSniperEnable->integer)
+				return originalCgZoomSensitivity() * sensitivity_adsScaleSniper->value;
+			else
+				return originalCgZoomSensitivity();
+		}
+		else if (sensitivity_adsScaleEnable->integer)
+			return originalCgZoomSensitivity() * sensitivity_adsScale->value;
+		else
+			return originalCgZoomSensitivity();
 	}
 
 	void cg_zoomSensitivity_scale()
@@ -45,18 +57,12 @@ namespace movement
 			if (*unknown)
 				*game::cg_zoomSensitivity = scaledCgZoomSensitivity();
 			else
-				*game::cg_zoomSensitivity = stockCgZoomSensitivity();
+				*game::cg_zoomSensitivity = originalCgZoomSensitivity();
 		}
 		else
 		{
-			*game::cg_zoomSensitivity = stockCgZoomSensitivity();
+			*game::cg_zoomSensitivity = originalCgZoomSensitivity();
 		}
-
-		/*auto unknown = (bool*)ABSOLUTE_CGAME_MP(0x30209458);
-		std::ostringstream oss;
-		oss << "##### unknown: " << *unknown << ", ads_progress: "<< *game::ads_progress << "\n";
-		std::string str = oss.str();
-		OutputDebugString(str.c_str());*/
 	}
 	
 	const auto cg_zoomSensitivity_calculation_stub = utils::hook::assemble([](utils::hook::assembler& a)
@@ -65,16 +71,10 @@ namespace movement
 			a.call(cg_zoomSensitivity_scale);
 			a.ret();
 		});
-
-
-
-
-
-
-
+	
 	void ready_hook_cgame_mp()
 	{
-		//utils::hook::jump(ABSOLUTE_CGAME_MP(0x30032fe8), cg_zoomSensitivity_calculation_stub);
+		utils::hook::jump(ABSOLUTE_CGAME_MP(0x30032fe8), cg_zoomSensitivity_calculation_stub);
 	}
 	
 	class component final : public component_interface
@@ -87,6 +87,11 @@ namespace movement
 				return;
 			}
 
+			sensitivity_adsScaleEnable = game::Cvar_Get("sensitivity_adsScaleEnable", "0", CVAR_ARCHIVE);
+			sensitivity_adsScale = game::Cvar_Get("sensitivity_adsScale", "0.4", CVAR_ARCHIVE);
+			sensitivity_adsScaleSniperEnable = game::Cvar_Get("sensitivity_adsScaleSniperEnable", "0", CVAR_ARCHIVE);
+			sensitivity_adsScaleSniper = game::Cvar_Get("sensitivity_adsScaleSniper", "0.7", CVAR_ARCHIVE);
+			
 			game::Cmd_AddCommand("lookback", Cmd_LookBack);
 		}
 	};
