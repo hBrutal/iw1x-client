@@ -30,7 +30,7 @@ void remove_crash_file()
     utils::io::remove_file("__cosp");
 }
 
-LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
+/*LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
 {
     if (exception_info->ExceptionRecord->ExceptionCode == 0x406D1388)
     {
@@ -76,7 +76,7 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
     TerminateProcess(GetCurrentProcess(), exception_info->ExceptionRecord->ExceptionCode);
 
     return EXCEPTION_CONTINUE_SEARCH;
-}
+}*/
 
 [[noreturn]] void WINAPI exit_hook(const int code)
 {
@@ -158,7 +158,7 @@ FARPROC load_binary()
 
     std::string data;
     if (!utils::io::read_file(client_filename, &data))
-        throw std::runtime_error(utils::string::va("Failed to read %s\nIs cod-mod into your Call of Duty folder?", client_filename.data()));
+        throw std::runtime_error(utils::string::va("Failed to read %s\nIs cod-mod in your Call of Duty folder?", client_filename.data()));
 
 #ifdef DEBUG
     remove_crash_file();
@@ -177,8 +177,8 @@ void enable_dpi_awareness()
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
-    AddVectoredExceptionHandler(0, exception_handler);
-    SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
+    //AddVectoredExceptionHandler(0, exception_handler);
+    //SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
     enable_dpi_awareness();
 
     auto premature_shutdown = true;
