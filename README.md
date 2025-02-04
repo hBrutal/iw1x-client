@@ -1,9 +1,12 @@
 > [!NOTE]
-> Currently replacing [c1cx](https://github.com/cod1dev/c1cx)  
+> Replacing [c1cx](https://github.com/cod1dev/c1cx)
 
-# Client extension for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game))
-### Adding security, fixes, and features
+# Client modification for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game))
+### Adding protection, fixes, and features
 Supported game version: **1.1**
+___
+### Usage and Build steps
+See the [Wiki](https://github.com/cod1dev/cod-mod/wiki)
 ___
 #### References
 - [codextended-client](https://github.com/xtnded/codextended-client)
