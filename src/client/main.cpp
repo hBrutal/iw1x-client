@@ -204,7 +204,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
             const launcher launcher;
             mode = launcher.run();
             if (mode == launcher::mode::none)
-                return 1;
+                return 0;
             game::environment::set_mode(mode);
         }
         entry_point = load_binary();

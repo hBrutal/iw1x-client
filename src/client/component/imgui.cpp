@@ -157,8 +157,6 @@ namespace imgui
 		
 		void pre_destroy() override
 		{
-			if (game::environment::is_dedi() || game::environment::is_sp())
-				return;
 			shutdown();
 		}
 	};

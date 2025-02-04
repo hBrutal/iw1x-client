@@ -70,6 +70,14 @@ namespace fixes
 	
 	void ready_hook_ui_mp()
 	{
+
+		/*std::ostringstream oss;
+		oss << "####### " << std::hex << ABSOLUTE_UI_MP(0x4000ea90) << "\n";
+		std::string str = oss.str();
+		OutputDebugString(str.c_str());*/
+		
+
+
 		// Prevents displaying servers twice (if double click Refresh List)
 		UI_StartServerRefresh_hook.create(ABSOLUTE_UI_MP(0x4000ea90), UI_StartServerRefresh_stub);
 		// Prevents displaying squares in server names
