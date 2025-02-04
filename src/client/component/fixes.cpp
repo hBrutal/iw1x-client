@@ -71,10 +71,12 @@ namespace fixes
 	void ready_hook_ui_mp()
 	{
 
-		/*std::ostringstream oss;
-		oss << "####### " << std::hex << ABSOLUTE_UI_MP(0x4000ea90) << "\n";
+		
+		
+		std::ostringstream oss;
+		oss << "####### ready_hook_ui_mp: " << std::hex << ABSOLUTE_UI_MP(0x4000ea90) << "\n";
 		std::string str = oss.str();
-		OutputDebugString(str.c_str());*/
+		OutputDebugString(str.c_str());
 		
 
 

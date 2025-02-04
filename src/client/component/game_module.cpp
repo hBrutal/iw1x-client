@@ -14,7 +14,6 @@ DWORD address_ui_mp;
 
 namespace game_module
 {
-	utils::hook::detour nt_LoadLibraryA_hook;
 	utils::hook::detour nt_GetModuleFileNameA_hook;
 	utils::hook::detour nt_GetModuleFileNameW_hook;
 
@@ -41,11 +40,9 @@ namespace game_module
 		fixes::ready_hook_ui_mp();
 	}
 	
-	HMODULE WINAPI nt_LoadLibraryA_stub(LPCSTR lpLibFileName)
+	HMODULE WINAPI LoadLibraryA_stub(LPCSTR lpLibFileName)
 	{
-		auto* orig = static_cast<decltype(LoadLibraryA)*>(nt_LoadLibraryA_hook.get_original());
-		auto ret = orig(lpLibFileName);
-
+		auto ret = LoadLibraryA(lpLibFileName);
 		auto hModule_address = (DWORD)GetModuleHandleA(lpLibFileName);
 
 		if (lpLibFileName != NULL)
@@ -59,6 +56,14 @@ namespace game_module
 			else if (!strcmp(fileName, "ui_mp_x86.dll"))
 			{
 				address_ui_mp = hModule_address;
+
+
+				std::ostringstream oss;
+				oss << "####### LoadLibraryA_stub: " << std::hex << address_ui_mp << "\n";
+				std::string str = oss.str();
+				OutputDebugString(str.c_str());
+
+
 				hook_dll_ui_mp();
 			}
 		}
@@ -117,6 +122,15 @@ namespace game_module
 	class component final : public component_interface
 	{
 	public:
+		void* load_import(const std::string& library, const std::string& function) override
+		{
+			if (function == "LoadLibraryA" && (!game::environment::is_dedi() && !game::environment::is_sp()))
+			{
+				return LoadLibraryA_stub;
+			}
+			return nullptr;
+		}
+		
 		void post_start() override
 		{
 			get_host_module();
@@ -128,7 +142,6 @@ namespace game_module
 			
 			const utils::nt::library kernel32("kernel32.dll");
 			
-			nt_LoadLibraryA_hook.create(kernel32.get_proc<HMODULE(WINAPI*)(LPCSTR)>("LoadLibraryA"), nt_LoadLibraryA_stub);
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
 			nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
 		}
