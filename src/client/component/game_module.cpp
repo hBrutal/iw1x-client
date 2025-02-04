@@ -56,14 +56,6 @@ namespace game_module
 			else if (!strcmp(fileName, "ui_mp_x86.dll"))
 			{
 				address_ui_mp = hModule_address;
-
-
-				std::ostringstream oss;
-				oss << "####### LoadLibraryA_stub: " << std::hex << address_ui_mp << "\n";
-				std::string str = oss.str();
-				OutputDebugString(str.c_str());
-
-
 				hook_dll_ui_mp();
 			}
 		}
@@ -122,7 +114,7 @@ namespace game_module
 	class component final : public component_interface
 	{
 	public:
-		void* load_import(const std::string& library, const std::string& function) override
+		void* load_import(const std::string&, const std::string& function) override
 		{
 			if (function == "LoadLibraryA" && (!game::environment::is_dedi() && !game::environment::is_sp()))
 			{

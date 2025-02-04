@@ -84,10 +84,10 @@ namespace utils::hook
         this->clear();
         this->place_ = place;
 
-        if (MH_CreateHook(this->place_, target, &this->original_) != MH_OK)
-        {
-            throw std::runtime_error(string::va("Unable to create hook at location: %p", this->place_));
-        }
+        MH_STATUS status = MH_CreateHook(this->place_, target, &this->original_);
+        if (status != MH_OK)
+            if (status != MH_ERROR_ALREADY_CREATED) // MH_STATUS can be MH_ERROR_ALREADY_CREATED for dll like ui_mp_x86
+                throw std::runtime_error(string::va("Unable to create hook at location: %p, MH_STATUS: %s", this->place_, MH_StatusToString(status)));
 
         this->enable();
     }
