@@ -9,8 +9,6 @@
 
 #include <DbgHelp.h>
 
-#include <version.hpp>
-
 const char* get_current_date()
 {
     auto now = std::chrono::system_clock::now();
@@ -58,7 +56,7 @@ LONG WINAPI exception_handler(PEXCEPTION_POINTERS exception_info)
         | MiniDumpWithThreadInfo;
 
     CreateDirectoryA("minidumps", nullptr);
-    const auto* file_name = utils::string::va("minidumps\\cod-mod_%s_%s.dmp", SHORTVERSION, get_current_date());
+    const auto* file_name = utils::string::va("minidumps\\cod-mod_%s.dmp", get_current_date());
     constexpr auto file_share = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
     const auto file_handle = CreateFileA(file_name, GENERIC_WRITE | GENERIC_READ, file_share, nullptr, CREATE_ALWAYS, NULL, nullptr);
