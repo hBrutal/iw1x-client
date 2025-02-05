@@ -51,8 +51,23 @@ namespace game
 		ERR_DROP,
 		// ...
 	} errorParm_t;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*typedef enum
+	{
+		CA_ACTIVE = 6
+	} connstate_t;*/
 
-
-
+	//typedef struct vm_s vm_t;
 
 }

@@ -19,14 +19,17 @@ namespace branding
 
 			scheduler::loop([]()
 			{
-				const auto x = 2;
-				const auto y = 10;
-				const auto font = 1;
-				const auto scale = 0.21f;
-				float color[4] = { 0.28f, 0.01f, 1.f, 0.75f };
+				const auto x = 1;
+				const auto y = 12;
+				const auto fontID = 1;
+				const auto scale = 0.25f;
+				float color[4] = { 1.f, 1.f, 1.f, 0.80f };
+				float color_shadow[4] = { 0.f, 0.f, 0.f, 0.80f };
 				const auto* text = MOD_NAME;
-				
-				game::SCR_DrawString(x, y, font, scale, color, text, NULL, NULL, NULL);
+
+				// Draw a drop shadow first				
+				game::SCR_DrawString(x + 1, y + 1, fontID, scale, color_shadow, text, NULL, NULL, NULL);				
+				game::SCR_DrawString(x, y, fontID, scale, color, text, NULL, NULL, NULL);
 
 			}, scheduler::pipeline::renderer);
 		}

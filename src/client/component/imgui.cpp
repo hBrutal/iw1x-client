@@ -5,6 +5,7 @@
 #include <utils/string.hpp>
 #include "imgui.hpp"
 
+#include "monitoring.hpp"
 #include "movement.hpp"
 
 namespace imgui
@@ -19,6 +20,12 @@ namespace imgui
 	float sensitivity_adsScale = 0.0f;
 	bool sensitivity_adsScaleSniperEnable = false;
 	float sensitivity_adsScaleSniper = 0.0f;
+	bool cg_drawDisconnect = true;
+	bool cg_drawWeaponSelect = true;
+	bool cg_drawFPS = false;
+	int cg_chatHeight = 8;
+	int con_boldgamemessagetime = 8;
+	bool cg_lagometer = false;
 	
 	void new_frame()
 	{
@@ -33,6 +40,12 @@ namespace imgui
 		sensitivity_adsScale = movement::sensitivity_adsScale->value;
 		sensitivity_adsScaleSniperEnable = movement::sensitivity_adsScaleSniperEnable->value;
 		sensitivity_adsScaleSniper = movement::sensitivity_adsScaleSniper->value;
+		cg_drawDisconnect = monitoring::cg_drawDisconnect->integer;
+		cg_drawWeaponSelect = monitoring::cg_drawWeaponSelect->integer;
+		cg_drawFPS = monitoring::cg_drawFPS->integer;
+		cg_chatHeight = monitoring::cg_chatHeight->integer;
+		con_boldgamemessagetime = monitoring::con_boldgamemessagetime->integer;
+		cg_lagometer = monitoring::cg_lagometer->integer;
 	}
 	
 	void draw_menu()
@@ -44,8 +57,32 @@ namespace imgui
 		ImGui::SetNextWindowFocus();
 		ImGui::Begin(MOD_NAME, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 
-		// Sensitivity multiplier
+		//// Interface
+		ImGui::SeparatorText("Interface");
+		ImGui::Checkbox("FPS", &cg_drawFPS);
+		ImGui::Checkbox("Lagometer", &cg_lagometer);
+		ImGui::Checkbox("\"Connection Interrupted\"", &cg_drawDisconnect);
+		ImGui::Checkbox("Weapon selection", &cg_drawWeaponSelect);
+
+		ImGui::Spacing();
+
+		ImGui::Text("Chat lines");
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		ImGui::SliderInt("##slider_cg_chatHeight", &cg_chatHeight, 0, 8);
+
+		ImGui::Spacing();
+
+		ImGui::Text("Middle messages seconds");
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		ImGui::SliderInt("##slider_con_boldgamemessagetime", &con_boldgamemessagetime, 0, 8);
+		////
+
+		// Spacing
+		ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+		//// ADS
 		ImGui::SeparatorText("Aim Down Sight");
+		// Sensitivity multiplier
 		ImGui::Checkbox("Sensitivity multiplier", &sensitivity_adsScaleEnable);
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		if (!sensitivity_adsScaleEnable)
@@ -64,6 +101,7 @@ namespace imgui
 		ImGui::SliderFloat("##slider_sensitivity_adsScaleSniper", &sensitivity_adsScaleSniper, 0.15f, 1.30f, "%.2f");
 		if (!sensitivity_adsScaleSniperEnable)
 			ImGui::EndDisabled();
+		////
 
 		ImGui::End();
 		menu_updates_settings();
@@ -75,6 +113,12 @@ namespace imgui
 		game::Cvar_Set(movement::sensitivity_adsScale->name, utils::string::va("%.2f", sensitivity_adsScale));
 		game::Cvar_Set(movement::sensitivity_adsScaleSniperEnable->name, sensitivity_adsScaleSniperEnable ? "1" : "0");
 		game::Cvar_Set(movement::sensitivity_adsScaleSniper->name, utils::string::va("%.2f", sensitivity_adsScaleSniper));
+		game::Cvar_Set(monitoring::cg_drawDisconnect->name, cg_drawDisconnect ? "1" : "0");
+		game::Cvar_Set(monitoring::cg_drawWeaponSelect->name, cg_drawWeaponSelect ? "1" : "0");
+		game::Cvar_Set(monitoring::cg_drawFPS->name, cg_drawFPS ? "1" : "0");
+		game::Cvar_Set(monitoring::cg_chatHeight->name, utils::string::va("%i", cg_chatHeight));
+		game::Cvar_Set(monitoring::con_boldgamemessagetime->name, utils::string::va("%i", con_boldgamemessagetime));
+		game::Cvar_Set(monitoring::cg_lagometer->name, utils::string::va("%i", cg_lagometer));
 	}
 
 	void end_frame()

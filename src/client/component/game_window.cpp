@@ -84,6 +84,13 @@ namespace game_window
 
 			utils::hook::set(0x4639b9 + 1, MainWndProc_stub);
 			utils::hook::set(0x5083b1, 0x00); // Alt+Tab support, see https://github.com/xtnded/codextended-client/pull/1
+
+
+
+
+
+
+			//utils::hook::nop(0x00466d0f, 3); // WIN_DisableAltTab
 		}
 	};
 }

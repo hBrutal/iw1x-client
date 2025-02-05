@@ -7,6 +7,7 @@
 
 #include "protection.hpp"
 #include "fixes.hpp"
+#include "monitoring.hpp"
 #include "movement.hpp"
 
 DWORD address_cgame_mp;
@@ -32,6 +33,7 @@ namespace game_module
 	void hook_dll_cgame_mp()
 	{
 		protection::ready_hook_cgame_mp();
+		monitoring::ready_hook_cgame_mp();
 		movement::ready_hook_cgame_mp();
 	}
 
@@ -111,6 +113,12 @@ namespace game_module
 		return ret;
 	}
 	
+	void Cmd_Test()
+	{
+
+
+	}
+	
 	class component final : public component_interface
 	{
 	public:
@@ -136,6 +144,16 @@ namespace game_module
 			
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
 			nt_GetModuleFileNameW_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPWSTR, DWORD)>("GetModuleFileNameW"), nt_GetModuleFileNameW_stub);
+		}
+		
+		void post_unpack() override
+		{
+			if (game::environment::is_dedi())
+			{
+				return;
+			}
+			
+			game::Cmd_AddCommand("test", Cmd_Test);
 		}
 	};
 }
