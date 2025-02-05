@@ -44,6 +44,15 @@ namespace protection
 		if (*cmd == 'v')
 		{
 			auto cvar_name = game::Cmd_Argv(1);
+
+
+			/*std::ostringstream oss;
+			oss << "####### CG_ServerCommand_stub: " << cvar_name << "\n";
+			std::string str = oss.str();
+			OutputDebugString(str.c_str());*/
+
+
+
 			if (cvarIsWriteProtected(cvar_name))
 				return;
 		}
@@ -52,6 +61,13 @@ namespace protection
 	
 	void CL_SystemInfoChanged_Cvar_Set_stub(const char* name, const char* value)
 	{
+
+		/*std::ostringstream oss;
+		oss << "####### CL_SystemInfoChanged_Cvar_Set_stub: " << name << "\n";
+		std::string str = oss.str();
+		OutputDebugString(str.c_str());*/
+
+
 		if (cvarIsWriteProtected(name))
 			return;
 		game::Cvar_Set(name, value);

@@ -32,9 +32,9 @@ namespace game_module
 	
 	void hook_dll_cgame_mp()
 	{
-		/*protection::ready_hook_cgame_mp();
+		protection::ready_hook_cgame_mp();
 		monitoring::ready_hook_cgame_mp();
-		movement::ready_hook_cgame_mp();*/
+		movement::ready_hook_cgame_mp();
 	}
 
 	void hook_dll_ui_mp()
