@@ -1,7 +1,7 @@
 > [!NOTE]
-> Replacing [c1cx](https://github.com/cod1dev/c1cx)
+> Replaced [c1cx](https://github.com/cod1dev/c1cx)
 
-# Client modification for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game))
+# Client modification for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game)) Multiplayer
 ### Adding protection, fixes, and features
 Supported game version: **1.1**
 ___
