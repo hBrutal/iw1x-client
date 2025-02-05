@@ -61,7 +61,7 @@ filter {}
 
 filter "configurations:Release"
 	optimize "Size"
-	buildoptions {"/GL"}
+	-- buildoptions {"/GL"} -- FIXME: crash when enabled
 	linkoptions {"/LTCG"}
 	defines {"NDEBUG"}
 	fatalwarnings { "All" }

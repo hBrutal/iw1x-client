@@ -4,7 +4,6 @@
 
 #include <utils/string.hpp>
 
-
 FARPROC loader::load(const utils::nt::library& library, const std::string& buffer) const
 {
 	if (buffer.empty()) return nullptr;
@@ -33,12 +32,10 @@ void loader::load_section(const utils::nt::library& target, const utils::nt::lib
 {
 	void* target_ptr = target.get_ptr() + section->VirtualAddress;
 	const void* source_ptr = source.get_ptr() + section->PointerToRawData;
-
-	if (PBYTE(target_ptr) >= (target.get_ptr() + BINARY_PAYLOAD_SIZE))
-	{
-		throw std::runtime_error("Section exceeds the binary payload size, please increase it!");
-	}
 	
+	if (PBYTE(target_ptr) >= (target.get_ptr() + BINARY_PAYLOAD_SIZE))
+		throw std::runtime_error("Section exceeds the binary payload size");
+
 	if (section->SizeOfRawData > 0)
 	{
 #if 0
@@ -59,9 +56,7 @@ void loader::load_section(const utils::nt::library& target, const utils::nt::lib
 void loader::load_sections(const utils::nt::library& target, const utils::nt::library& source) const
 {
 	for (auto& section : source.get_section_headers())
-	{
 		this->load_section(target, source, section);
-	}
 }
 
 void loader::load_imports(const utils::nt::library& target, const utils::nt::library& source) const
@@ -73,7 +68,7 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 	while (descriptor->Name)
 	{
 		std::string name = LPSTR(target.get_ptr() + descriptor->Name);
-		
+
 		auto* name_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->OriginalFirstThunk);
 		auto* address_table_entry = reinterpret_cast<uintptr_t*>(target.get_ptr() + descriptor->FirstThunk);
 
@@ -86,34 +81,30 @@ void loader::load_imports(const utils::nt::library& target, const utils::nt::lib
 		{
 			FARPROC function = nullptr;
 			std::string function_name;
+			const char* function_procname;
 
-			// is this an ordinal-only import?
 			if (IMAGE_SNAP_BY_ORDINAL(*name_table_entry))
+			{
+				function_name = "#" + std::to_string(IMAGE_ORDINAL(*name_table_entry));
+				function_procname = MAKEINTRESOURCEA(IMAGE_ORDINAL(*name_table_entry));
+			}
+			else
+			{
+				auto* import = PIMAGE_IMPORT_BY_NAME(target.get_ptr() + *name_table_entry);
+				function_name = import->Name;
+				function_procname = function_name.data();
+			}
+
+			if (this->import_resolver_) function = FARPROC(this->import_resolver_(name, function_name));
+			if (!function)
 			{
 				auto library = utils::nt::library::load(name);
 				if (library)
 				{
-					function = GetProcAddress(library, MAKEINTRESOURCEA(IMAGE_ORDINAL(*name_table_entry)));
+					function = GetProcAddress(library, function_procname);
 				}
+			}
 
-				function_name = "#" + std::to_string(IMAGE_ORDINAL(*name_table_entry));
-			}
-			else
-			{
-				auto * import = PIMAGE_IMPORT_BY_NAME(target.get_ptr() + *name_table_entry);
-				function_name = import->Name;
-				
-				if (this->import_resolver_) function = FARPROC(this->import_resolver_(name, function_name));
-				if (!function)
-				{
-					auto library = utils::nt::library::load(name);
-					if (library)
-					{
-						function = GetProcAddress(library, function_name.data());
-					}
-				}
-			}
-			
 			if (!function)
 			{
 				throw std::runtime_error(utils::string::va("Unable to load import '%s' from library '%s'", function_name.data(), name.data()));

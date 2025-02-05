@@ -1,4 +1,5 @@
 #include <std_include.hpp>
+#if 1
 #include "loader/component_loader.hpp"
 #include <utils/hook.hpp>
 #include "game/game.hpp"
@@ -93,3 +94,4 @@ namespace fixes
 }
 
 REGISTER_COMPONENT(fixes::component)
+#endif

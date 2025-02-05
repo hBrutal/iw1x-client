@@ -1,4 +1,5 @@
 #include <std_include.hpp>
+#if 1
 #include <utils/hook.hpp>
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
@@ -11,8 +12,11 @@ namespace game_window
 {
 	LRESULT CALLBACK MainWndProc_stub(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-			return true;
+		//if (uMsg != WM_KEYDOWN || wParam != VK_HOME) // Not to send toggle key to imgui
+		//{
+			if (imgui::displayed && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+				return true;
+		//}
 		
 		switch (uMsg)
 		{
@@ -85,3 +89,4 @@ namespace game_window
 }
 
 REGISTER_COMPONENT(game_window::component)
+#endif

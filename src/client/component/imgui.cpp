@@ -1,4 +1,5 @@
 #include <std_include.hpp>
+#if 1
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
 #include <utils/string.hpp>
@@ -163,3 +164,4 @@ namespace imgui
 }
 
 REGISTER_COMPONENT(imgui::component)
+#endif

@@ -1,4 +1,5 @@
 #include <std_include.hpp>
+#if 1
 #include <utils/hook.hpp>
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
@@ -193,3 +194,4 @@ namespace scheduler
 }
 
 REGISTER_COMPONENT(scheduler::component)
+#endif

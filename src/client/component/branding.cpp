@@ -1,4 +1,5 @@
 #include <std_include.hpp>
+#if 1
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
 
@@ -33,3 +34,4 @@ namespace branding
 }
 
 REGISTER_COMPONENT(branding::component)
+#endif
