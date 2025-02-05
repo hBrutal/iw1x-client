@@ -95,7 +95,7 @@ namespace protection
 	public:
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi())
+			if (game::environment::is_dedi() || game::environment::is_sp())
 				return;
 			
 			// Use a cvar blacklist for CL_SystemInfoChanged

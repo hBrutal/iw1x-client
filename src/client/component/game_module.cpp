@@ -139,7 +139,7 @@ namespace game_module
 		void post_load() override
 		{
 			assert(get_host_module() == get_client_module());
-			
+
 			const utils::nt::library kernel32("kernel32.dll");
 			
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);
@@ -148,7 +148,7 @@ namespace game_module
 		
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi())
+			if (game::environment::is_dedi() || game::environment::is_sp())
 			{
 				return;
 			}
