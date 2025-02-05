@@ -193,7 +193,7 @@ namespace imgui
 	public:
 		void* load_import(const std::string&, const std::string& function) override
 		{
-			if (function == "SwapBuffers" && (!game::environment::is_dedi() && !game::environment::is_sp()))
+			if (function == "SwapBuffers")
 			{
 				return SwapBuffers_stub;
 			}

@@ -1,4 +1,0 @@
-#include "resource.hpp"
-
-ID_ICON		ICON	"resources/icon.ico"
-MENU_MAIN	RCDATA	"resources/main.html"

@@ -1,9 +1,7 @@
 #include <std_include.hpp>
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
-#include "launcher/launcher.hpp"
 #include "loader/loader.hpp"
-#include <utils/flags.hpp>
 #include <utils/io.hpp>
 #include <utils/string.hpp>
 
@@ -32,18 +30,6 @@ static FARPROC WINAPI get_proc_address(const HMODULE hModule, const LPCSTR lpPro
     if (lpProcName == "GlobalMemoryStatusEx"s)
         component_loader::post_unpack();
     return GetProcAddress(hModule, lpProcName);
-}
-
-static launcher::mode detect_mode_from_arguments()
-{
-    if (utils::flags::has_flag("dedicated"))
-        return launcher::mode::server;
-    if (utils::flags::has_flag("multiplayer"))
-        return launcher::mode::multiplayer;
-    if (utils::flags::has_flag("singleplayer"))
-        return launcher::mode::singleplayer;
-    
-    return launcher::mode::none;
 }
 
 static FARPROC load_binary()
@@ -109,16 +95,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
     {
         if (!component_loader::post_start())
             return 1;
-
-        auto mode = detect_mode_from_arguments();
-        if (mode == launcher::mode::none)
-        {
-            const launcher launcher;
-            mode = launcher.run();
-            if (mode == launcher::mode::none)
-                return 0;
-            game::environment::set_mode(mode);
-        }
 
         entry_point = load_binary();
         if (!entry_point)

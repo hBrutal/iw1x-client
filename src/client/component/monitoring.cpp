@@ -65,24 +65,19 @@ namespace monitoring
 	public:
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi() || game::environment::is_sp())
-			{
-				return;
-			}
-
 			cg_drawFPS = game::Cvar_Get("cg_drawFPS", "0", CVAR_ARCHIVE);
 			cg_drawWeaponSelect = game::Cvar_Get("cg_drawWeaponSelect", "1", CVAR_ARCHIVE);
-			
-			if (game::environment::is_mp())
-			{
-				//cg_drawPing = game::Cvar_Get("cg_drawPing", "0", CVAR_ARCHIVE);
-				//scheduler::loop(cg_draw_ping, scheduler::pipeline::renderer);
+			cg_drawDisconnect = game::Cvar_Get("cg_drawDisconnect", "1", CVAR_ARCHIVE);
+			cg_chatHeight = game::Cvar_Get("cg_chatHeight", "8", CVAR_ARCHIVE);
+			con_boldgamemessagetime = game::Cvar_Get("con_boldgamemessagetime", "8", CVAR_ARCHIVE);
+			cg_lagometer = game::Cvar_Get("cg_lagometer", "0", CVAR_ARCHIVE);
 
-				cg_drawDisconnect = game::Cvar_Get("cg_drawDisconnect", "1", CVAR_ARCHIVE);
-				cg_chatHeight = game::Cvar_Get("cg_chatHeight", "8", CVAR_ARCHIVE);
-				con_boldgamemessagetime = game::Cvar_Get("con_boldgamemessagetime", "8", CVAR_ARCHIVE);
-				cg_lagometer = game::Cvar_Get("cg_lagometer", "0", CVAR_ARCHIVE);
-			}
+
+
+
+
+			//cg_drawPing = game::Cvar_Get("cg_drawPing", "0", CVAR_ARCHIVE);
+			//scheduler::loop(cg_draw_ping, scheduler::pipeline::renderer);
 		}
 	};
 }

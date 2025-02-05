@@ -48,12 +48,9 @@
 
 // Disable some errors for Release config
 #pragma warning(disable: 4244) // C2220 (xutility)
-#pragma warning(disable: 4100) // C2220 (html_dispatch.cpp)
 
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
 #pragma comment(lib, "opengl32.lib")
-
-#include "resource.hpp"
 
 using namespace std::literals;

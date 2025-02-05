@@ -25,26 +25,6 @@ namespace utils::hook
         } __;
     }
 
-    void assembler::pushad()
-    {
-        
-    }
-
-    void assembler::popad()
-    {
-        
-    }
-
-    void assembler::prepare_stack_for_call()
-    {
-        
-    }
-
-    void assembler::restore_stack_after_call()
-    {
-        
-    }
-
     asmjit::Error assembler::call(void* target)
     {
         return Assembler::call(size_t(target));
@@ -111,22 +91,6 @@ namespace utils::hook
     void* detour::get_original() const
     {
         return this->original_;
-    }
-
-    bool iat(const nt::library& library, const std::string& target_library, const std::string& process, void* stub)
-    {
-        if (!library.is_valid()) return false;
-
-        auto* const ptr = library.get_iat_entry(target_library, process);
-        if (!ptr) return false;
-
-        DWORD protect;
-        VirtualProtect(ptr, sizeof(*ptr), PAGE_EXECUTE_READWRITE, &protect);
-
-        *ptr = stub;
-
-        VirtualProtect(ptr, sizeof(*ptr), protect, &protect);
-        return true;
     }
 
     void nop(void* place, const size_t length)

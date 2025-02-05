@@ -175,14 +175,9 @@ namespace scheduler
 
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi() || game::environment::is_sp())
-			{
-				return;
-			}
-
-			r_end_frame_hook.create(reinterpret_cast<void(*)(int*, int*)>(SP_OR_MP(0, 0x004de4b0)), r_end_frame_stub); // RE_EndFrame
-			utils::hook::call(SP_OR_MP(0, 0x0046426f), main_frame_stub); // Com_Frame
-			utils::hook::call(reinterpret_cast<void(*)(int)>(SP_OR_MP(0, 0x004380df)), server_frame_stub); // SV_Frame
+			r_end_frame_hook.create(reinterpret_cast<void(*)(int*, int*)>(0x004de4b0), r_end_frame_stub); // RE_EndFrame
+			utils::hook::call(0x0046426f, main_frame_stub); // Com_Frame
+			utils::hook::call(reinterpret_cast<void(*)(int)>(0x004380df), server_frame_stub); // SV_Frame
 		}
 
 		void pre_destroy() override

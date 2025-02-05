@@ -83,11 +83,6 @@ namespace movement
 	public:
 		void post_unpack() override
 		{
-			if (game::environment::is_sp())
-			{
-				return;
-			}
-
 			sensitivity_adsScaleEnable = game::Cvar_Get("sensitivity_adsScaleEnable", "0", CVAR_ARCHIVE);
 			sensitivity_adsScale = game::Cvar_Get("sensitivity_adsScale", "0.4", CVAR_ARCHIVE);
 			sensitivity_adsScaleSniperEnable = game::Cvar_Get("sensitivity_adsScaleSniperEnable", "0", CVAR_ARCHIVE);

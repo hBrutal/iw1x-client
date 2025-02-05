@@ -1,7 +1,6 @@
 #pragma once
 
 #include "types.hpp"
-#include "launcher/launcher.hpp"
 
 extern DWORD address_cgame_mp;
 extern DWORD address_ui_mp;
@@ -12,21 +11,16 @@ extern DWORD address_ui_mp;
 #define ABSOLUTE_CGAME_MP(relative) (address_cgame_mp + (relative - OFFSET_CGAME_MP))
 #define ABSOLUTE_UI_MP(relative)	(address_ui_mp + (relative - OFFSET_UI_MP))
 
-#define SP_OR_MP(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
+//#define SP_OR_MP(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
 
 namespace game
 {
 	namespace environment
 	{
-		launcher::mode get_mode();
 		std::string get_client_filename();
 
-		bool is_mp();
-		bool is_sp();
-		bool is_dedi();
-		bool is_mohaa();
 
-		void set_mode(launcher::mode mode);
+		bool is_mohaa();
 		void set_mohaa();
 	}
 
@@ -43,7 +37,7 @@ namespace game
 
 		T* get() const
 		{
-			T* ptr = environment::is_sp() ? sp_object : mp_object;
+			T* ptr = mp_object;//environment::is_sp() ? sp_object : mp_object;
 			uintptr_t base_address = 0;
 
 			switch (offset)

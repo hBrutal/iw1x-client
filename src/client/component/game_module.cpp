@@ -32,9 +32,9 @@ namespace game_module
 	
 	void hook_dll_cgame_mp()
 	{
-		protection::ready_hook_cgame_mp();
+		/*protection::ready_hook_cgame_mp();
 		monitoring::ready_hook_cgame_mp();
-		movement::ready_hook_cgame_mp();
+		movement::ready_hook_cgame_mp();*/
 	}
 
 	void hook_dll_ui_mp()
@@ -124,7 +124,7 @@ namespace game_module
 	public:
 		void* load_import(const std::string&, const std::string& function) override
 		{
-			if (function == "LoadLibraryA" && (!game::environment::is_dedi() && !game::environment::is_sp()))
+			if (function == "LoadLibraryA")
 			{
 				return LoadLibraryA_stub;
 			}
@@ -148,11 +148,6 @@ namespace game_module
 		
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi() || game::environment::is_sp())
-			{
-				return;
-			}
-			
 			game::Cmd_AddCommand("test", Cmd_Test);
 		}
 	};

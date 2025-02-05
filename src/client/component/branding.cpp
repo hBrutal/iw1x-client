@@ -12,11 +12,6 @@ namespace branding
 	public:
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi() || game::environment::is_sp())
-			{
-				return;
-			}
-
 			scheduler::loop([]()
 			{
 				const auto x = 1;

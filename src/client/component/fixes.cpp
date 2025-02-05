@@ -71,10 +71,8 @@ namespace fixes
 	
 	void ready_hook_ui_mp()
 	{
-		// Prevents displaying servers twice (if double click Refresh List)
-		UI_StartServerRefresh_hook.create(ABSOLUTE_UI_MP(0x4000ea90), UI_StartServerRefresh_stub);
-		// Prevents displaying squares in server names
-		utils::hook::call(SP_OR_MP(0, 0x412A2C), CL_SetServerInfo_hostname_strncpy_stub);
+		// Prevent displaying servers twice (if double click Refresh List)
+		UI_StartServerRefresh_hook.create(ABSOLUTE_UI_MP(0x4000ea90), UI_StartServerRefresh_stub);		
 	}
 	
 	class component final : public component_interface
@@ -82,13 +80,11 @@ namespace fixes
 	public:
 		void post_unpack() override
 		{
-			if (game::environment::is_dedi() || game::environment::is_sp())
-			{
-				return;
-			}
+			// Prevent inserting the char of the console key in the text field
+			utils::hook::jump(0x40CB1E, Field_CharEvent_ignore_console_char_stub);
 
-			// Prevents inserting the char of the console key in the text field
-			utils::hook::jump(SP_OR_MP(0, 0x40CB1E), Field_CharEvent_ignore_console_char_stub);
+			// Prevent displaying squares in server names
+			utils::hook::call(0x412A2C, CL_SetServerInfo_hostname_strncpy_stub);
 		}
 	};
 }

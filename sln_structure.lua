@@ -60,9 +60,9 @@ filter "platforms:Win*"
 filter {}
 
 filter "configurations:Release"
-	optimize "Size"
+	optimize "Speed"
 	-- buildoptions {"/GL"} -- FIXME: crash when enabled
-	linkoptions {"/LTCG"}
+	-- linkoptions {"/LTCG"}
 	defines {"NDEBUG"}
 	fatalwarnings { "All" }
 filter {}

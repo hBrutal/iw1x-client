@@ -1,5 +1,6 @@
 #pragma once
-#include "signature.hpp"
+
+#include "nt.hpp"
 
 #include <asmjit/core/jitruntime.h>
 #include <asmjit/x86/x86assembler.h>
@@ -14,20 +15,6 @@ namespace utils::hook
         using Assembler::Assembler;
         using Assembler::call;
         using Assembler::jmp;
-
-        void pushad();
-        void popad();
-
-        void prepare_stack_for_call();
-        void restore_stack_after_call();
-
-        template <typename T>
-        void call_aligned(T&& target)
-        {
-            this->prepare_stack_for_call();
-            this->call(std::forward<T>(target));
-            this->restore_stack_after_call();
-        }
 
         asmjit::Error call(void* target);
         asmjit::Error jmp(void* target);
@@ -90,8 +77,6 @@ namespace utils::hook
         void* place_{};
         void* original_{};
     };
-
-    bool iat(const nt::library& library, const std::string& target_library, const std::string& process, void* stub);
 
     void nop(void* place, size_t length);
     void nop(size_t place, size_t length);
