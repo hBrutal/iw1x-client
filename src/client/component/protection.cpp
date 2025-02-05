@@ -11,28 +11,18 @@ namespace protection
 	utils::hook::detour CG_ServerCommand_hook;
 	utils::hook::detour CL_SystemInfoChanged_hook;
 	
-	std::vector<std::string> writeProtectedCvars = // TODO: maybe use a whitelist instead
+	std::vector<std::string> cvarsWhiteList =
 	{
-		"activeAction",
-		"cg_norender",
-		"cl_allowDownload",
-		"cl_avidemo",
-		"cl_updateavailable",
-		"cl_updatefiles",
-		"m_pitch",
-		"m_yaw",
-		"name",
-		"r_showImages",
-		"sensitivity",
-		"com_maxfps",
-		"rate",
-		"snaps",
-		"com_maxpackets"
+		"g_scriptMainMenu",
+		"scr_showweapontab",
+		"cg_objectiveText",
+		"fs_game",
+		"sv_serverid",
 	};
 
-	bool cvarIsWriteProtected(const char* cvar_name)
+	static bool cvarIsInWhitelist(const char* cvar_name)
 	{
-		for (const auto& str : writeProtectedCvars)
+		for (const auto& str : cvarsWhiteList)
 			if (!_stricmp(str.c_str(), cvar_name))
 				return true;
 		return false;
@@ -53,7 +43,7 @@ namespace protection
 
 
 
-			if (cvarIsWriteProtected(cvar_name))
+			if (!cvarIsInWhitelist(cvar_name))
 				return;
 		}
 		CG_ServerCommand_hook.invoke();
@@ -68,7 +58,7 @@ namespace protection
 		OutputDebugString(str.c_str());*/
 
 
-		if (cvarIsWriteProtected(name))
+		if (!cvarIsInWhitelist(name))
 			return;
 		game::Cvar_Set(name, value);
 	}
@@ -102,7 +92,7 @@ namespace protection
 	
 	void ready_hook_cgame_mp()
 	{
-		// Use a cvar blacklist for setClientCvar GSC method
+		// Use a cvar whitelist for setClientCvar GSC method
 		CG_ServerCommand_hook.create(ABSOLUTE_CGAME_MP(0x3002e0d0), CG_ServerCommand_stub);
 	}
 	
@@ -111,7 +101,7 @@ namespace protection
 	public:
 		void post_unpack() override
 		{
-			// Use a cvar blacklist for CL_SystemInfoChanged
+			// Use a cvar whitelist for CL_SystemInfoChanged
 			utils::hook::call(0x00415ffe, CL_SystemInfoChanged_Cvar_Set_stub);
 			
 			// Check in sv_pakNames and sv_referencedPakNames for an indicator of a non-pk3 file incoming download
