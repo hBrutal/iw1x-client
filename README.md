@@ -1,5 +1,5 @@
 > [!NOTE]
-> Replacing [c1cx](https://github.com/cod1dev/c1cx)
+> Replaced [c1cx](https://github.com/cod1dev/c1cx)
 
 # Client modification for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game))
 ### Adding protection, fixes, and features
