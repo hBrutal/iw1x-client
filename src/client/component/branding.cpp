@@ -22,9 +22,9 @@ namespace branding
 						return;
 					
 					const auto x = 1;
-					const auto y = 12;
+					const auto y = 10;
 					const auto fontID = 1;
-					const auto scale = 0.25f;
+					const auto scale = 0.21f;
 					float color[4] = { 1.f, 1.f, 1.f, 0.80f };
 					float color_shadow[4] = { 0.f, 0.f, 0.f, 0.80f };
 					const auto* text = MOD_NAME;

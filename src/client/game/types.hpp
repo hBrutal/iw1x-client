@@ -51,6 +51,38 @@ namespace game
 		ERR_DROP,
 		// ...
 	} errorParm_t;
+
+
+
+
+
+
+
+
+
+
+	typedef struct
+	{
+		float x;
+		float y;
+		float w;
+		float h;
+	} rectDef_t;
+	typedef rectDef_t Rectangle;
+	typedef struct
+	{
+		Rectangle rect;
+		Rectangle rectClient;
+		const char* name;
+		// ...
+	} windowDef_t;
+
+	typedef windowDef_t Window;
+	typedef struct itemDef_s
+	{
+		Window window;
+		// ...
+	} itemDef_t;
 	
 	
 	

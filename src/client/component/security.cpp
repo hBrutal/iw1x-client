@@ -4,13 +4,13 @@
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
 
-#include "protection.hpp"
+#include "security.hpp"
 
-namespace protection
+namespace security
 {
 	utils::hook::detour CG_ServerCommand_hook;
 	utils::hook::detour CL_SystemInfoChanged_hook;
-	
+
 	std::vector<std::string> cvarsWhiteList =
 	{
 		"g_scriptMainMenu",
@@ -48,7 +48,7 @@ namespace protection
 		}
 		CG_ServerCommand_hook.invoke();
 	}
-	
+
 	void CL_SystemInfoChanged_Cvar_Set_stub(const char* name, const char* value)
 	{
 
@@ -62,7 +62,7 @@ namespace protection
 			return;
 		game::Cvar_Set(name, value);
 	}
-	
+
 	const char* Info_ValueForKey(const char* buffer, const char* key)
 	{
 		_asm
@@ -74,7 +74,7 @@ namespace protection
 			call eax
 		}
 	}
-	
+
 #define NON_PK3_PROTECTION_MESSAGE "Non-pk3 download protection triggered"
 	void CL_SystemInfoChanged_stub()
 	{
@@ -83,12 +83,72 @@ namespace protection
 		char* systemInfo = cl_gameState_stringData + cl_gameState_stringOffsets[0];
 		const char* sv_pakNames = Info_ValueForKey(systemInfo, "sv_pakNames");
 		const char* sv_referencedPakNames = Info_ValueForKey(systemInfo, "sv_referencedPakNames");
-		
+
 		if (strstr(sv_pakNames, "@") || strstr(sv_referencedPakNames, "@"))
 			game::Com_Error(game::ERR_DROP, NON_PK3_PROTECTION_MESSAGE);
 
 		CL_SystemInfoChanged_hook.invoke();
 	}
+
+
+
+
+
+
+
+
+
+
+	/*utils::hook::detour Item_RunScript_hook;
+	void __declspec(naked) Item_RunScript(game::itemDef_t* item, const char* s)
+	{
+		_asm
+		{
+			mov esi, item
+			mov edx, s
+
+			pop esi
+			pop edx
+
+			
+			mov eax, address_ui_mp
+			add eax, 0x400111d0
+			jmp eax
+		}
+	}
+	void check(game::itemDef_t* item, const char* s)
+	{
+		Item_RunScript_hook.disable();
+
+		std::ostringstream oss;
+		oss << "####### s: " << s << "\n";
+		oss << "####### item->window.name: " << item->window.name << "\n";
+		std::string str = oss.str();
+		OutputDebugString(str.c_str());
+
+		Item_RunScript(item, s);
+
+		Item_RunScript_hook.enable();
+	}
+
+	__declspec(naked) void Item_RunScript_stub()
+	{
+		_asm
+		{
+			push edx // s
+			push esi // item
+			call check
+			add esp, 0x8
+		}
+	}*/
+
+	void ready_hook_ui_mp()
+	{
+		//Item_RunScript_hook.create(ABSOLUTE_UI_MP(0x400111d0), Item_RunScript_stub);
+	}
+
+
+
 	
 	void ready_hook_cgame_mp()
 	{
@@ -110,5 +170,5 @@ namespace protection
 	};
 }
 
-REGISTER_COMPONENT(protection::component)
+REGISTER_COMPONENT(security::component)
 #endif

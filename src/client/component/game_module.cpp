@@ -5,7 +5,7 @@
 
 #include "game_module.hpp"
 
-#include "protection.hpp"
+#include "security.hpp"
 #include "fixes.hpp"
 #include "monitoring.hpp"
 #include "movement.hpp"
@@ -32,13 +32,14 @@ namespace game_module
 	
 	void hook_dll_cgame_mp()
 	{
-		protection::ready_hook_cgame_mp();
+		security::ready_hook_cgame_mp();
 		monitoring::ready_hook_cgame_mp();
 		movement::ready_hook_cgame_mp();
 	}
 
 	void hook_dll_ui_mp()
 	{
+		security::ready_hook_ui_mp();
 		fixes::ready_hook_ui_mp();
 	}
 	
