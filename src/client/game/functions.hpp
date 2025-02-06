@@ -24,5 +24,6 @@ namespace game
 
 
 
+	//WEAK symbol<void()> IN_MouseMove{ 0, 0x00461850 };
 	//WEAK symbol<int(vm_t* vm, int callnum, ...)> VM_Call{ 0, 0x00460480 };
 }
