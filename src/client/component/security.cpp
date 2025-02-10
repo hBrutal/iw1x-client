@@ -89,6 +89,10 @@ namespace security
 
 		CL_SystemInfoChanged_hook.invoke();
 	}
+	
+	
+	
+	
 
 
 
@@ -99,53 +103,60 @@ namespace security
 
 
 
-	/*utils::hook::detour Item_RunScript_hook;
-	void __declspec(naked) Item_RunScript(game::itemDef_t* item, const char* s)
+
+
+
+	/*__declspec(naked) void Item_RunScript()
 	{
 		_asm
 		{
-			mov esi, item
-			mov edx, s
-
-			pop esi
 			pop edx
-
+			pop esi
 			
 			mov eax, address_ui_mp
 			add eax, 0x400111d0
-			jmp eax
+
+			ret
 		}
 	}
+	utils::hook::detour Item_RunScript_hook;
 	void check(game::itemDef_t* item, const char* s)
 	{
-		Item_RunScript_hook.disable();
-
 		std::ostringstream oss;
 		oss << "####### s: " << s << "\n";
 		oss << "####### item->window.name: " << item->window.name << "\n";
 		std::string str = oss.str();
 		OutputDebugString(str.c_str());
-
-		Item_RunScript(item, s);
-
-		Item_RunScript_hook.enable();
+		
+		Item_RunScript_hook.disable();
 	}
-
 	__declspec(naked) void Item_RunScript_stub()
 	{
 		_asm
 		{
-			push edx // s
-			push esi // item
+			push edx
+			push esi
 			call check
-			add esp, 0x8
+			add esp, 8
+
+			call Item_RunScript
+			ret
 		}
 	}*/
-
 	void ready_hook_ui_mp()
 	{
 		//Item_RunScript_hook.create(ABSOLUTE_UI_MP(0x400111d0), Item_RunScript_stub);
 	}
+
+
+
+
+
+
+
+
+
+
 
 
 
