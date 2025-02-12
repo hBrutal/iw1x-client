@@ -5,12 +5,9 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <Windows.h>
-#include <MsHTML.h>
-#include <MsHtmHst.h>
 #include <shellapi.h>
 #include <ShlObj.h>
 #include <atlbase.h>
-#include <dwmapi.h>
 #include <GL/gl.h>
 
 // min and max is required by gdi, therefore NOMINMAX won't work
@@ -28,7 +25,6 @@
 #define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONWARNING);
 #define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONERROR | MB_SETFOREGROUND | MB_TOPMOST);
 
-#include <cassert>
 #include <cstring>
 #include <filesystem>
 #include <mutex>
@@ -45,9 +41,6 @@
 
 #include <asmjit/core/jitruntime.h>
 #include <asmjit/x86/x86assembler.h>
-
-// Disable some errors for Release config
-#pragma warning(disable: 4244) // C2220 (xutility)
 
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")

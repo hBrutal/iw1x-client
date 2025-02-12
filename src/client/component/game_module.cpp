@@ -3,8 +3,6 @@
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
 
-#include "game_module.hpp"
-
 #include "security.hpp"
 #include "fixes.hpp"
 #include "monitoring.hpp"
@@ -17,18 +15,6 @@ namespace game_module
 {
 	utils::hook::detour nt_GetModuleFileNameA_hook;
 	utils::hook::detour nt_GetModuleFileNameW_hook;
-
-	utils::nt::library get_client_module()
-	{
-		static utils::nt::library client{ HMODULE(0x400000) };
-		return client;
-	}
-
-	utils::nt::library get_host_module()
-	{
-		static utils::nt::library host{};
-		return host;
-	}
 	
 	void hook_dll_cgame_mp()
 	{
@@ -131,16 +117,9 @@ namespace game_module
 			}
 			return nullptr;
 		}
-		
-		void post_start() override
-		{
-			get_host_module();
-		}
 
 		void post_load() override
 		{
-			assert(get_host_module() == get_client_module());
-
 			const utils::nt::library kernel32("kernel32.dll");
 			
 			nt_GetModuleFileNameA_hook.create(kernel32.get_proc<DWORD(WINAPI*)(HMODULE, LPSTR, DWORD)>("GetModuleFileNameA"), nt_GetModuleFileNameA_stub);

@@ -34,14 +34,11 @@ namespace security
 		if (*cmd == 'v')
 		{
 			auto cvar_name = game::Cmd_Argv(1);
-
-
+			
 			/*std::ostringstream oss;
 			oss << "####### CG_ServerCommand_stub: " << cvar_name << "\n";
 			std::string str = oss.str();
 			OutputDebugString(str.c_str());*/
-
-
 
 			if (!cvarIsInWhitelist(cvar_name))
 				return;
@@ -51,12 +48,10 @@ namespace security
 
 	void CL_SystemInfoChanged_Cvar_Set_stub(const char* name, const char* value)
 	{
-
 		/*std::ostringstream oss;
 		oss << "####### CL_SystemInfoChanged_Cvar_Set_stub: " << name << "\n";
 		std::string str = oss.str();
 		OutputDebugString(str.c_str());*/
-
 
 		if (!cvarIsInWhitelist(name))
 			return;
@@ -75,7 +70,6 @@ namespace security
 		}
 	}
 
-#define NON_PK3_PROTECTION_MESSAGE "Non-pk3 download protection triggered"
 	void CL_SystemInfoChanged_stub()
 	{
 		char* cl_gameState_stringData = (char*)0x01436a7c;
@@ -85,15 +79,10 @@ namespace security
 		const char* sv_referencedPakNames = Info_ValueForKey(systemInfo, "sv_referencedPakNames");
 
 		if (strstr(sv_pakNames, "@") || strstr(sv_referencedPakNames, "@"))
-			game::Com_Error(game::ERR_DROP, NON_PK3_PROTECTION_MESSAGE);
+			game::Com_Error(game::ERR_DROP, "Non-pk3 download protection triggered");
 
 		CL_SystemInfoChanged_hook.invoke();
 	}
-	
-	
-	
-	
-
 
 
 
@@ -125,14 +114,13 @@ namespace security
 
 			pop esi
 			pop edx
-			
+
+
 			mov eax, address_ui_mp
 			add eax, 0x000111d0
 			call eax
 			
-			
 			//call enable
-
 
 			ret
 		}

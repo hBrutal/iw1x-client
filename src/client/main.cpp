@@ -7,12 +7,6 @@
 
 #include <DbgHelp.h>
 
-static void remove_crash_file()
-{
-    utils::io::remove_file("__codmp");
-    utils::io::remove_file("__cosp");
-}
-
 [[noreturn]] static void WINAPI exit_hook(const int code)
 {
     component_loader::pre_destroy();
@@ -72,6 +66,11 @@ static void enable_dpi_awareness()
     const auto set_dpi = user32 ? user32.get_proc<BOOL(WINAPI*)(DPI_AWARENESS_CONTEXT)>("SetProcessDpiAwarenessContext") : nullptr;
     if (set_dpi)
         set_dpi(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+}
+
+static void remove_crash_file()
+{
+    utils::io::remove_file("__codmp");
 }
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)

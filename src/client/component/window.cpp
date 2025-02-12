@@ -17,7 +17,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace game_window
+namespace window
 {
 
 
@@ -287,5 +287,5 @@ namespace game_window
 	};
 }
 
-REGISTER_COMPONENT(game_window::component)
+REGISTER_COMPONENT(window::component)
 #endif
