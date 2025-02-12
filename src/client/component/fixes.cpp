@@ -64,14 +64,14 @@ namespace fixes
 		Q_CleanStr_keep_colors(hostname);
 #pragma warning(push)
 #pragma warning(disable: 4996)
-		strncpy(dest, hostname, destsize); // destsize is already max-1 (=31), so not using _TRUNCATE not to lose a char
+		strncpy(dest, hostname, destsize); // destsize is already max-1 (=31), so not using _TRUNCATE, not to lose a char
 #pragma warning(pop)
 		return dest;
 	}
 	
 	void ready_hook_ui_mp()
 	{
-		// Prevent displaying servers twice (if double click Refresh List)
+		// Prevent displaying servers twice (occurs if double click Refresh List)
 		UI_StartServerRefresh_hook.create(ABSOLUTE_UI_MP(0x4000ea90), UI_StartServerRefresh_stub);		
 	}
 	
@@ -80,10 +80,10 @@ namespace fixes
 	public:
 		void post_unpack() override
 		{
-			// Prevent inserting the char of the console key in the text field
+			// Prevent inserting the char of the console key in the text field (e.g. Superscript Two gets inserted using french keyboard)
 			utils::hook::jump(0x40CB1E, Field_CharEvent_ignore_console_char_stub);
 
-			// Prevent displaying squares in server names
+			// Prevent displaying squares in server name (occurs when hostname contains e.g. SOH chars)
 			utils::hook::call(0x412A2C, CL_SetServerInfo_hostname_strncpy_stub);
 		}
 	};
