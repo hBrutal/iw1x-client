@@ -75,7 +75,10 @@ namespace movement
 	
 	void ready_hook_cgame_mp()
 	{
-		utils::hook::jump(ABSOLUTE_CGAME_MP(0x30032fe8), cg_zoomSensitivity_calculation_stub);
+		if (*game::clc_demoplaying != game::qtrue)
+		{
+			utils::hook::jump(ABSOLUTE_CGAME_MP(0x30032fe8), cg_zoomSensitivity_calculation_stub);
+		}
 	}
 	
 	class component final : public component_interface
