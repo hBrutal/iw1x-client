@@ -104,31 +104,15 @@ namespace security
 
 
 
-
-
-	/*__declspec(naked) void Item_RunScript()
-	{
-		_asm
-		{
-			pop edx
-			pop esi
-			
-			mov eax, address_ui_mp
-			add eax, 0x400111d0
-
-			ret
-		}
-	}
+#if 0
 	utils::hook::detour Item_RunScript_hook;
-	void check(game::itemDef_t* item, const char* s)
+	void disable()
 	{
-		std::ostringstream oss;
-		oss << "####### s: " << s << "\n";
-		oss << "####### item->window.name: " << item->window.name << "\n";
-		std::string str = oss.str();
-		OutputDebugString(str.c_str());
-		
 		Item_RunScript_hook.disable();
+	}
+	void enable()
+	{
+		Item_RunScript_hook.enable();
 	}
 	__declspec(naked) void Item_RunScript_stub()
 	{
@@ -136,13 +120,24 @@ namespace security
 		{
 			push edx
 			push esi
-			call check
-			add esp, 8
 
-			call Item_RunScript
+			call disable
+
+			pop esi
+			pop edx
+			
+			mov eax, address_ui_mp
+			add eax, 0x000111d0
+			call eax
+			
+			
+			//call enable
+
+
 			ret
 		}
-	}*/
+	}
+#endif
 	void ready_hook_ui_mp()
 	{
 		//Item_RunScript_hook.create(ABSOLUTE_UI_MP(0x400111d0), Item_RunScript_stub);
