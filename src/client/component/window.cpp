@@ -282,7 +282,7 @@ namespace window
 
 
 
-			//utils::hook::nop(0x00466d0f, 3); // WIN_DisableAltTab
+			//utils::hook::nop(0x00466d0f, 5); // WIN_DisableAltTab
 		}
 	};
 }

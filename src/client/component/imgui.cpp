@@ -5,6 +5,7 @@
 #include <utils/string.hpp>
 #include "imgui.hpp"
 
+#include "security.hpp"
 #include "monitoring.hpp"
 #include "movement.hpp"
 
@@ -26,6 +27,7 @@ namespace imgui
 	int cg_chatHeight = 8;
 	int con_boldgamemessagetime = 8;
 	bool cg_lagometer = false;
+	bool cl_allowDownload = false;
 	
 	void new_frame()
 	{
@@ -46,6 +48,7 @@ namespace imgui
 		cg_chatHeight = monitoring::cg_chatHeight->integer;
 		con_boldgamemessagetime = monitoring::con_boldgamemessagetime->integer;
 		cg_lagometer = monitoring::cg_lagometer->integer;
+		cl_allowDownload = security::cl_allowDownload->integer;
 	}
 	
 	void draw_menu()
@@ -56,6 +59,14 @@ namespace imgui
 		ImGui::SetNextWindowPos(ImVec2(50, 200), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowFocus();
 		ImGui::Begin(MOD_NAME, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+		//// Security
+		ImGui::SeparatorText("Security");
+		ImGui::Checkbox("Downloading", &cl_allowDownload);
+		////
+
+		// Spacing
+		ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 		//// Interface
 		ImGui::SeparatorText("Interface");
@@ -118,7 +129,8 @@ namespace imgui
 		game::Cvar_Set(monitoring::cg_drawFPS->name, cg_drawFPS ? "1" : "0");
 		game::Cvar_Set(monitoring::cg_chatHeight->name, utils::string::va("%i", cg_chatHeight));
 		game::Cvar_Set(monitoring::con_boldgamemessagetime->name, utils::string::va("%i", con_boldgamemessagetime));
-		game::Cvar_Set(monitoring::cg_lagometer->name, utils::string::va("%i", cg_lagometer));
+		game::Cvar_Set(monitoring::cg_lagometer->name, cg_lagometer ? "1" : "0");
+		game::Cvar_Set(security::cl_allowDownload->name, cl_allowDownload ? "1" : "0");
 	}
 
 	void end_frame()

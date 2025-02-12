@@ -85,6 +85,13 @@ namespace fixes
 
 			// Prevent displaying squares in server name (occurs when hostname contains e.g. SOH chars)
 			utils::hook::call(0x412A2C, CL_SetServerInfo_hostname_strncpy_stub);
+
+			/*
+			Prevent the CD Key error when joining a server (occurs when joined a fs_game server previously)
+			("CD Key is not valid. Please enter...")
+			See https://github.com/xtnded/codextended-client/blob/45af251518a390ab08b1c8713a6a1544b70114a1/fixes.cpp#L21
+			*/
+			utils::hook::nop(0x0042d122, 5);
 		}
 	};
 }

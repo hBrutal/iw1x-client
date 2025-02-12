@@ -11,6 +11,8 @@ namespace security
 	utils::hook::detour CG_ServerCommand_hook;
 	utils::hook::detour CL_SystemInfoChanged_hook;
 
+	game::cvar_t* cl_allowDownload;
+
 	std::vector<std::string> cvarsWhiteList =
 	{
 		"g_scriptMainMenu",
@@ -160,6 +162,8 @@ namespace security
 			
 			// Check in sv_pakNames and sv_referencedPakNames for an indicator of a non-pk3 file incoming download
 			CL_SystemInfoChanged_hook.create(0x00415eb0, CL_SystemInfoChanged_stub);
+
+			cl_allowDownload = game::Cvar_Get("cl_allowDownload", "0", CVAR_ARCHIVE);
 		}
 	};
 }
