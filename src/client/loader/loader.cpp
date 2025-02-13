@@ -33,7 +33,7 @@ void loader::load_section(const utils::nt::library& target, const utils::nt::lib
 	void* target_ptr = target.get_ptr() + section->VirtualAddress;
 	const void* source_ptr = source.get_ptr() + section->PointerToRawData;
 	
-	if (PBYTE(target_ptr) >= (target.get_ptr() + BINARY_PAYLOAD_SIZE))
+	if (PBYTE(target_ptr) > (target.get_ptr() + BINARY_PAYLOAD_SIZE))
 		throw std::runtime_error("Section exceeds the binary payload size");
 
 	if (section->SizeOfRawData > 0)

@@ -1,10 +1,11 @@
 #pragma once
 
 /*
-Determined size using Ghidra Memory Map Window for CoDMP.exe
-Length of: Headers + .text + .rdata + .data + .data + .rsrc
+Size determined using Ghidra
+IMAGE_NT_HEADERS32 > IMAGE_OPTIONAL_HEADER32
+SizeOfImage - SizeOfHeaders
 */
-#define BINARY_PAYLOAD_SIZE 0x15C1008
+#define BINARY_PAYLOAD_SIZE 0x15C1000
 
 #define WIN32_LEAN_AND_MEAN
 
