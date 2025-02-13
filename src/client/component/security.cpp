@@ -19,6 +19,7 @@ namespace security
 		"scr_showweapontab",
 		"cg_objectiveText",
 		"fs_game",
+		"sv_cheats",
 		"sv_serverid",
 	};
 
