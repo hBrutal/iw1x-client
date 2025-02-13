@@ -102,9 +102,6 @@ namespace utils::nt
 		PIMAGE_DOS_HEADER get_dos_header() const;
 		PIMAGE_OPTIONAL_HEADER get_optional_header() const;
 
-		void** get_iat_entry(const std::string& module_name, const std::string& proc_name) const;
-		void** get_iat_entry(const std::string& module_name, const char* name) const;
-
 	private:
 		HMODULE module_;
 	};
