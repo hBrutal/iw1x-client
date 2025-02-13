@@ -21,6 +21,7 @@ namespace security
 		"fs_game",
 		"sv_cheats",
 		"sv_serverid",
+		"timescale",
 	};
 
 	static bool cvarIsInWhitelist(const char* cvar_name)
@@ -37,11 +38,12 @@ namespace security
 		if (*cmd == 'v')
 		{
 			auto cvar_name = game::Cmd_Argv(1);
-			
-			/*std::ostringstream oss;
+#if 0
+			std::ostringstream oss;
 			oss << "####### CG_ServerCommand_stub: " << cvar_name << "\n";
 			std::string str = oss.str();
-			OutputDebugString(str.c_str());*/
+			OutputDebugString(str.c_str());
+#endif
 
 			if (!cvarIsInWhitelist(cvar_name))
 				return;
@@ -51,10 +53,12 @@ namespace security
 
 	void CL_SystemInfoChanged_Cvar_Set_stub(const char* name, const char* value)
 	{
-		/*std::ostringstream oss;
+#if 0
+		std::ostringstream oss;
 		oss << "####### CL_SystemInfoChanged_Cvar_Set_stub: " << name << "\n";
 		std::string str = oss.str();
-		OutputDebugString(str.c_str());*/
+		OutputDebugString(str.c_str());
+#endif
 
 		if (!cvarIsInWhitelist(name))
 			return;
