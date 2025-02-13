@@ -1,6 +1,10 @@
 #pragma once
 
-#define BINARY_PAYLOAD_SIZE 0x0B500000 // TODO: find the proper size
+/*
+Determined size using Ghidra Memory Map Window for CoDMP.exe
+Length of: Headers + .text + .rdata + .data + .data + .rsrc
+*/
+#define BINARY_PAYLOAD_SIZE 0x15C1008
 
 #define WIN32_LEAN_AND_MEAN
 

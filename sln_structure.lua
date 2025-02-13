@@ -1,7 +1,4 @@
-dependencies =
-{
-	basePath = "./deps"
-}
+dependencies = { basePath = "./deps" }
 
 function dependencies.load()
 	dir = path.join(dependencies.basePath, "premake/*.lua")
@@ -31,15 +28,15 @@ end
 dependencies.load()
 
 workspace "cod-mod"
+configurations { "Debug", "Release" }
+platforms "Win32"
+architecture "x86"
 startproject "client"
 location "./build"
 objdir "%{wks.location}/obj"
 targetdir "%{wks.location}/bin/%{cfg.platform}/%{cfg.buildcfg}"
-configurations {"Debug", "Release"}
 language "C++"
 cppdialect "C++20"
-architecture "x86"
-platforms "Win32"
 systemversion "latest"
 symbols "On"
 staticruntime "On"
@@ -55,42 +52,41 @@ flags
 	"No64BitChecks"
 }
 
-filter "platforms:Win*"
-	defines {"_WINDOWS", "WIN32"}
-filter {}
-
-filter "configurations:Release"
-	optimize "Speed"
-	-- buildoptions {"/GL"} -- FIXME: crash when enabled
-	-- linkoptions {"/LTCG"}
-	defines {"NDEBUG"}
-	fatalwarnings { "All" }
-filter {}
-
+-- Config: Debug
 filter "configurations:Debug"
-	optimize "Debug"
-	defines {"DEBUG", "_DEBUG"}
-filter {}
+optimize "Debug"
+defines { "DEBUG" }
 
-project "common"
-kind "StaticLib"
-language "C++"
-files {"./src/common/**.hpp", "./src/common/**.cpp"}
-includedirs {"./src/common", "%{prj.location}/src"}
-resincludedirs {"$(ProjectDir)src"}
-dependencies.imports()
+-- Config: Release
+filter "configurations:Release"
+optimize "Speed"
+linktimeoptimization "On"
+linkoptions
+{
+	"/OPT:NOREF", -- Prevents crash when using /GL
+}
+defines { "NDEBUG" }
+fatalwarnings { "All" }
 
+-- Project: client
 project "client"
 kind "WindowedApp"
-language "C++"
 targetname "cod-mod"
 pchheader "std_include.hpp"
 pchsource "src/client/std_include.cpp"
-linkoptions {"/DYNAMICBASE:NO", "/SAFESEH:NO", "/LARGEADDRESSAWARE", "/LAST:._text", "/PDBCompress"}
-files {"./src/client/**.rc", "./src/client/**.hpp", "./src/client/**.cpp", "./src/resources/**.*"}
+linkoptions { "/DYNAMICBASE:NO", "/SAFESEH:NO", "/LARGEADDRESSAWARE", "/LAST:._text", "/PDBCompress" }
+files { "./src/client/**.rc", "./src/client/**.hpp", "./src/client/**.cpp", "./src/resources/**.*" }
 includedirs {"./src/client", "./src/common", "%{prj.location}/src"}
-resincludedirs {"$(ProjectDir)src"}
-links {"common"}
+resincludedirs { "$(ProjectDir)src" }
+links { "common" }
+dependencies.imports()
+
+-- Project: common
+project "common"
+kind "StaticLib"
+files { "./src/common/**.hpp", "./src/common/**.cpp" }
+includedirs { "./src/common", "%{prj.location}/src" }
+resincludedirs { "$(ProjectDir)src" }
 dependencies.imports()
 
 group "Dependencies"

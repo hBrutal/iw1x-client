@@ -11,7 +11,7 @@
 DWORD address_cgame_mp;
 DWORD address_ui_mp;
 
-namespace game_module
+namespace init
 {
 	utils::hook::detour nt_GetModuleFileNameA_hook;
 	utils::hook::detour nt_GetModuleFileNameW_hook;
@@ -133,4 +133,4 @@ namespace game_module
 	};
 }
 
-REGISTER_COMPONENT(game_module::component)
+REGISTER_COMPONENT(init::component)
