@@ -7,6 +7,7 @@ See the [Wiki](https://github.com/cod1dev/cod-mod/wiki)
 ___
 #### References
 - [codextended-client](https://github.com/xtnded/codextended-client)
+- [CoDPlusPlus](https://github.com/kartjom/CoDPlusPlus)
 - [AlterWare](https://alterware.dev/)
 - [Aurora](https://auroramod.dev/)
 - [RTCW-MP](https://github.com/id-Software/RTCW-MP/)
