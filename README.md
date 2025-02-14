@@ -2,7 +2,7 @@
 ### Adding security, fixes, and features
 Supported game version: **1.1**
 ___
-<img src="https://github.com/user-attachments/assets/0d3f5ebf-7bab-49b0-b04b-c895269bf831" width="80%">
+<img src="https://github.com/user-attachments/assets/0d3f5ebf-7bab-49b0-b04b-c895269bf831" width="85%">
 
 ___
 ### Usage and Build steps
