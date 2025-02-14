@@ -6,6 +6,10 @@
 
 #include "imgui.hpp"
 
+#include <utils/string.hpp>
+
+
+
 
 
 
@@ -13,21 +17,10 @@
 
 
 
-
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace window
 {
-
-
-
-
-
-
-
-
-
 
 
 
@@ -157,19 +150,58 @@ namespace window
 
 
 
+	HHOOK hHook;
 
+	utils::hook::detour Com_Init_hook;
 
+	LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+	{
+		if (GetForegroundWindow() == *game::hWnd)
+		{
+			if (nCode == HC_ACTION)
+			{
+				auto pKey = (KBDLLHOOKSTRUCT*)lParam;
 
+				auto altDown = (pKey->flags & LLKHF_ALTDOWN);
+				auto escDown_sys = (pKey->vkCode == VK_ESCAPE && wParam == WM_SYSKEYDOWN);
+				auto escUp_sys = (pKey->vkCode == VK_ESCAPE && wParam == WM_SYSKEYUP);
+				
+				if (altDown)
+				{
+					if (escDown_sys)
+					{
+						if (!imgui::waitForMenuKeyRelease)
+						{
+							imgui::toggle_menu_flag();
+							imgui::waitForMenuKeyRelease = true;
+						}
+						return 1; // Prevent Windows Alt+Esc behavior
+					}
+					else if (escUp_sys)
+					{
+						imgui::waitForMenuKeyRelease = false;
+					}
+				}
+				else if (imgui::waitForMenuKeyRelease)
+				{
+					// Released Alt before releasing Esc
+					imgui::waitForMenuKeyRelease = false;
+				}
+			}
+		}
 
+		return CallNextHookEx(hHook, nCode, wParam, lParam);
+	}
 
 	LRESULT CALLBACK MainWndProc_stub(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (imgui::displayed && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		if (/*imgui::displayed && */ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 			return true;
 
 		
 		switch (uMsg)
 		{
+
 
 
 
@@ -204,66 +236,60 @@ namespace window
 
 
 
-
 		case WM_CREATE:
-			SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) | WS_MINIMIZEBOX); // Adds minimize button and Win+M support
+			SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) | WS_MINIMIZEBOX); // Add minimize button and Win+M support
 
 
 			//in_raw_mouse_init(hWnd);
 
 
 			break;
-		case WM_KEYDOWN:
-			if (wParam == VK_HOME)
-			{
-				if (!imgui::waitForMenuKeyRelease)
-				{
-					if (!imgui::displayed)
-					{
-						imgui::displayed = true;
-						game::IN_DeactivateMouse();
-						*reinterpret_cast<int*>(0x8e2520) = 0; // mouseActive
-						*reinterpret_cast<int*>(0x8e2524) = 0; // mouseInitialized
-					}
-					else
-					{
-						imgui::displayed = false;
-						*reinterpret_cast<int*>(0x8e2524) = 1; // mouseInitialized
-						game::IN_ActivateMouse();
-					}
-				}
-				imgui::waitForMenuKeyRelease = true;
-				return 0;
-			}
-			else
+		case WM_CHAR:
+			if (wParam == VK_ESCAPE)
 			{
 				if (imgui::displayed)
-					return 0; // Prevents player from moving
-			}
-			break;
-		case WM_KEYUP:
-			if (wParam == VK_HOME)
-			{
-				if (imgui::waitForMenuKeyRelease)
 				{
-					imgui::waitForMenuKeyRelease = false;
-					return 0;
+					// Allow closing imgui by pressing only Esc
+					imgui::toggle_menu_flag();
 				}
 			}
+			break;
+		case WM_KEYDOWN:
+			if (imgui::displayed)
+				return 0; // Prevent moving
 			break;
 		case WM_MOUSEWHEEL:
 			if (imgui::displayed)
-				return 0; // Prevents player from changing weapon
+				return 0; // Prevent changing weapon
 			break;
 		case WM_MENUCHAR:
 			if (imgui::displayed)
-				return MNC_CLOSE << 16; // Prevents Alt+Enter beep sound
+				return MNC_CLOSE << 16; // Prevent Alt+Enter beep sound
 			break;
+		}
+		
+		if (imgui::displayed)
+		{
+			/*
+			When opening imgui, and not using the below code, it would fail getting focus (except if Alt+Esc was pressed in a particular way)
+			See https://github.com/kartjom/CoDPlusPlus/blob/359539f889958b2cbd58884cbc5bb0e3e5a3c294/CoDPlusPlus/src/Utils/WinApiHelper.cpp#L210
+			*/
+			if (wParam == SC_KEYMENU && (lParam >> 16) <= 0)
+				return 0;
 		}
 		
 		return game::MainWndProc(hWnd, uMsg, wParam, lParam);
 	}
-
+	
+	void Com_Init_stub(char* commandLine)
+	{
+		hHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
+		if (!hHook)
+			throw std::runtime_error(utils::string::va("SetWindowsHookEx for LowLevelKeyboardProc failed"));
+		
+		Com_Init_hook.invoke(commandLine);
+	}
+	
 	class component final : public component_interface
 	{
 	public:
@@ -271,15 +297,15 @@ namespace window
 		{
 			utils::hook::set(0x4639b9 + 1, MainWndProc_stub);
 			utils::hook::set(0x5083b1, 0x00); // Alt+Tab support, see https://github.com/xtnded/codextended-client/pull/1
+			
+			Com_Init_hook.create(0x004375c0, Com_Init_stub);
 
 
 
 
+			
 			/*utils::hook::call(0x00461ae7, &in_mouse_move);
 			cl_rawInput = game::Cvar_Get("cl_rawInput", "0", CVAR_ARCHIVE);*/
-
-
-
 
 
 			//utils::hook::nop(0x00466d0f, 5); // WIN_DisableAltTab

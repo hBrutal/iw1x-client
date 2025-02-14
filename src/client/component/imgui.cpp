@@ -14,6 +14,7 @@ namespace imgui
 	bool initialized = false;
 	bool displayed = false;
 	bool waitForMenuKeyRelease = false;
+
 	HGLRC imguiWglContext;
 	HWND hWnd_during_init;
 
@@ -28,6 +29,45 @@ namespace imgui
 	int con_boldgamemessagetime = 8;
 	bool cg_lagometer = false;
 	bool cl_allowDownload = false;
+
+	void toggle_menu_flag()
+	{
+		if (!displayed)
+		{
+			displayed = true;
+			game::IN_DeactivateMouse();
+			*reinterpret_cast<int*>(0x8e2520) = 0; // mouseActive
+			*reinterpret_cast<int*>(0x8e2524) = 0; // mouseInitialized
+		}
+		else
+		{
+			displayed = false;
+			*reinterpret_cast<int*>(0x8e2524) = 1; // mouseInitialized
+			game::IN_ActivateMouse();
+		}
+	}
+
+	void init(HDC hdc)
+	{
+		hWnd_during_init = *game::hWnd;
+		imguiWglContext = wglCreateContext(hdc);
+
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Verdana.ttf", 16.0f);
+		ImGui_ImplWin32_InitForOpenGL(*game::hWnd);
+		ImGui_ImplOpenGL2_Init();
+
+		initialized = true;
+	}
+
+	void gui_on_frame()
+	{
+		new_frame();
+		draw_menu();
+		end_frame();
+	}
 	
 	void new_frame()
 	{
@@ -50,7 +90,7 @@ namespace imgui
 		cg_lagometer = monitoring::cg_lagometer->integer;
 		cl_allowDownload = security::cl_allowDownload->integer;
 	}
-	
+
 	void draw_menu()
 	{
 		menu_loads_settings();
@@ -79,13 +119,13 @@ namespace imgui
 
 		ImGui::Text("Chat lines");
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-		ImGui::SliderInt("##slider_cg_chatHeight", &cg_chatHeight, 0, 8);
+		ImGui::SliderInt("##slider_cg_chatHeight", &cg_chatHeight, 0, 8, "%i", ImGuiSliderFlags_NoInput);
 
 		ImGui::Spacing();
 
 		ImGui::Text("Middle messages seconds");
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-		ImGui::SliderInt("##slider_con_boldgamemessagetime", &con_boldgamemessagetime, 0, 8);
+		ImGui::SliderInt("##slider_con_boldgamemessagetime", &con_boldgamemessagetime, 0, 8, "%i", ImGuiSliderFlags_NoInput);
 		////
 
 		// Spacing
@@ -98,7 +138,7 @@ namespace imgui
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		if (!sensitivity_adsScaleEnable)
 			ImGui::BeginDisabled();
-		ImGui::SliderFloat("##slider_sensitivity_adsScale", &sensitivity_adsScale, 0.15f, 1.30f, "%.2f");
+		ImGui::SliderFloat("##slider_sensitivity_adsScale", &sensitivity_adsScale, 0.15f, 1.30f, "%.2f", ImGuiSliderFlags_NoInput);
 		if (!sensitivity_adsScaleEnable)
 			ImGui::EndDisabled();
 
@@ -109,7 +149,7 @@ namespace imgui
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		if (!sensitivity_adsScaleSniperEnable)
 			ImGui::BeginDisabled();
-		ImGui::SliderFloat("##slider_sensitivity_adsScaleSniper", &sensitivity_adsScaleSniper, 0.15f, 1.30f, "%.2f");
+		ImGui::SliderFloat("##slider_sensitivity_adsScaleSniper", &sensitivity_adsScaleSniper, 0.15f, 1.30f, "%.2f", ImGuiSliderFlags_NoInput);
 		if (!sensitivity_adsScaleSniperEnable)
 			ImGui::EndDisabled();
 		////
@@ -139,27 +179,7 @@ namespace imgui
 		ImGui::Render();
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 	}
-
-	void gui_on_frame()
-	{
-		new_frame();
-		draw_menu();
-		end_frame();
-	}
-
-	void init(HDC hdc)
-	{
-		hWnd_during_init = *game::hWnd;
-		imguiWglContext = wglCreateContext(hdc);
-
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGui_ImplWin32_InitForOpenGL(*game::hWnd);
-		ImGui_ImplOpenGL2_Init();
-
-		initialized = true;
-	}
-
+	
 	void shutdown()
 	{
 		if (initialized)
