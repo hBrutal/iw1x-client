@@ -6,7 +6,7 @@ ___
 
 ___
 ### Usage and Build steps
-See the [Wiki](https://github.com/cod1dev/cod-mod/wiki)
+See the [Wiki](https://github.com/raphael12333/cod-mod/wiki)
 ___
 #### References
 - [codextended-client](https://github.com/xtnded/codextended-client)
