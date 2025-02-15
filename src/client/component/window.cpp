@@ -21,6 +21,8 @@ namespace window
 
 	HHOOK hHook;
 
+	game::cvar_t* r_fullscreen;
+
 	utils::hook::detour Com_Init_hook;
 	utils::hook::detour IN_MouseMove_hook;
 
@@ -102,22 +104,49 @@ namespace window
 	
 	static void IN_MouseMove_stub()
 	{
-		// Apply raw input only when playing
-		if (movement::m_rawinput->integer && *game::cls_keyCatchers == 0) // TODO: Figure out why have to use "== 0" instead of "& KEYCATCH_CGAME"
+		// Apply raw input only for player move
+		if (movement::m_rawinput->integer)
 		{
-			rawInput_move();
-			return;
+			if (*game::cls_keyCatchers == 0) // TODO: Figure out why have to use "== 0" instead of "& KEYCATCH_CGAME"
+			{
+				rawInput_move();
+				return;
+			}
+			
+			if (r_fullscreen->integer && *game::cgvm != NULL)
+			{
+				// .menu + console open = no player move
+				if (*game::cls_keyCatchers == 3)
+				{
+					IN_MouseMove_hook.invoke();
+					return;
+				}
+
+				if (*game::cls_keyCatchers & KEYCATCH_CONSOLE)
+				{
+					rawInput_move();
+					return;
+				}
+			}
 		}
+
 		IN_MouseMove_hook.invoke();
 	}
 	
 	static void WM_INPUT_process(LPARAM lParam)
 	{
-		// Prevent view from moving after closing imgui/menu/console
+		//// Prevent view from moving after closing:
+		// imgui
 		if (imgui::displayed)
 			return;
-		if (*game::cls_keyCatchers & KEYCATCH_UI || *game::cls_keyCatchers & KEYCATCH_CONSOLE)
+		// .menu
+		if (*game::cls_keyCatchers & KEYCATCH_UI)
 			return;
+		// console when windowed
+		if (*game::cls_keyCatchers & KEYCATCH_CONSOLE && !r_fullscreen->integer)
+			return;
+		////
+		
 		// Prevent view from moving after coming back from another window
 		if (GetForegroundWindow() != *game::hWnd)
 			return;
@@ -195,13 +224,16 @@ namespace window
 	public:
 		void post_unpack() override
 		{
+			r_fullscreen = game::Cvar_Get("r_fullscreen", "0", CVAR_ARCHIVE | CVAR_LATCH);
+
 			utils::hook::set(0x4639b9 + 1, MainWndProc_stub);
 			utils::hook::set(0x5083b1, 0x00); // Alt+Tab support, see https://github.com/xtnded/codextended-client/pull/1
 			
 			Com_Init_hook.create(0x004375c0, Com_Init_stub);
 			IN_MouseMove_hook.create(0x00461850, IN_MouseMove_stub);
 
-			
+
+
 
 
 			//utils::hook::nop(0x00466d0f, 5); // WIN_DisableAltTab

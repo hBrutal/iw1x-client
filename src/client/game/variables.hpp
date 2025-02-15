@@ -18,16 +18,12 @@ namespace game
 	WEAK symbol<weaponInfo_t[MAX_WEAPONS]> cg_weapons{ 0, 0x300eef3c, OFFSET_CGAME_MP };
 	WEAK symbol<qboolean> refreshActive{ 0, 0x401EA698, OFFSET_UI_MP };
 	WEAK symbol<qboolean> clc_demoplaying{ 0, 0x015ef004 };
+	WEAK symbol<vm_t*> cgvm{ 0, 0x01617348 };
 
 
-
-
-
-	
 	
 	
 	
 	//WEAK symbol<connstate_t> cls_state{ 0, 0x155F2C0 };
-	//WEAK symbol<vm_t*> cgvm{ 0, 0x01617348 };
 	//WEAK symbol<vm_t*> uivm{ 0, 0x0161747c };
 }

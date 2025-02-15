@@ -18,6 +18,7 @@ namespace game
 	typedef unsigned char byte;
 	typedef enum { qfalse, qtrue } qboolean;
 	typedef void (*xcommand_t)(void);
+	typedef struct vm_s vm_t;
 	
 	typedef struct cvar_s
 	{
@@ -74,7 +75,6 @@ namespace game
 
 
 
-
 	/*typedef struct
 	{
 		float x;
@@ -99,12 +99,10 @@ namespace game
 	} itemDef_t;*/
 
 
-	
 	/*typedef enum
 	{
 		CA_ACTIVE = 6
 	} connstate_t;*/
 
-	//typedef struct vm_s vm_t;
 
 }
