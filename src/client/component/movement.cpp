@@ -10,6 +10,7 @@ namespace movement
 	game::cvar_t* sensitivity_adsScale;
 	game::cvar_t* sensitivity_adsScaleSniperEnable;
 	game::cvar_t* sensitivity_adsScaleSniper;
+	game::cvar_t* m_rawinput;
 	
 	void Cmd_LookBack()
 	{
@@ -44,9 +45,8 @@ namespace movement
 			return originalCgZoomSensitivity();
 	}
 
-	void cg_zoomSensitivity_scale()
+	void cg_zoomSensitivity_scale() // See 30032e20
 	{
-		// See 30032e20
 		if (*game::ads_progress == 1)
 		{
 			*game::cg_zoomSensitivity = scaledCgZoomSensitivity();
@@ -90,6 +90,7 @@ namespace movement
 			sensitivity_adsScale = game::Cvar_Get("sensitivity_adsScale", "0.4", CVAR_ARCHIVE);
 			sensitivity_adsScaleSniperEnable = game::Cvar_Get("sensitivity_adsScaleSniperEnable", "0", CVAR_ARCHIVE);
 			sensitivity_adsScaleSniper = game::Cvar_Get("sensitivity_adsScaleSniper", "0.7", CVAR_ARCHIVE);
+			m_rawinput = game::Cvar_Get("m_rawinput", "0", CVAR_ARCHIVE);
 			
 			game::Cmd_AddCommand("lookback", Cmd_LookBack);
 		}

@@ -102,8 +102,12 @@ namespace init
 	
 	void Cmd_Test()
 	{
-
-
+#if 0
+		std::ostringstream oss;
+		oss << "###### " << *game::cls_keyCatchers << "\n";
+		std::string str = oss.str();
+		OutputDebugString(str.c_str());
+#endif
 	}
 	
 	class component final : public component_interface

@@ -1,9 +1,17 @@
 #pragma once
 
-#define MAX_STRING_CHARS 1024
-#define CVAR_ARCHIVE 1
-#define MAX_WEAPONS 64
-#define YAW 1
+constexpr auto MAX_STRING_CHARS = 1024;
+constexpr auto MAX_WEAPONS = 64;
+
+constexpr auto CVAR_ARCHIVE = 1;
+constexpr auto CVAR_LATCH = 32;
+
+constexpr auto KEYCATCH_CONSOLE = 0x0001;
+constexpr auto KEYCATCH_UI = 0x0002;
+constexpr auto KEYCATCH_MESSAGE = 0x0004;
+constexpr auto KEYCATCH_CGAME = 0x0008;
+
+constexpr auto YAW = 1;
 
 namespace game
 {
@@ -61,7 +69,13 @@ namespace game
 
 
 
-	typedef struct
+
+
+
+
+
+
+	/*typedef struct
 	{
 		float x;
 		float y;
@@ -82,18 +96,9 @@ namespace game
 	{
 		Window window;
 		// ...
-	} itemDef_t;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	} itemDef_t;*/
+
+
 	
 	/*typedef enum
 	{

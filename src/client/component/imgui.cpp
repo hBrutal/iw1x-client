@@ -29,6 +29,7 @@ namespace imgui
 	int con_boldgamemessagetime = 8;
 	bool cg_lagometer = false;
 	bool cl_allowDownload = false;
+	bool m_rawinput = false;
 
 	void toggle_menu_flag()
 	{
@@ -47,22 +48,27 @@ namespace imgui
 		}
 	}
 
-	void init(HDC hdc)
+	static void init(HDC hdc)
 	{
 		hWnd_during_init = *game::hWnd;
 		imguiWglContext = wglCreateContext(hdc);
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+
 		ImGuiIO& io = ImGui::GetIO();
 		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Verdana.ttf", 16.0f);
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowPadding.x += 8;
+		style.WindowPadding.y += 7;
+
 		ImGui_ImplWin32_InitForOpenGL(*game::hWnd);
 		ImGui_ImplOpenGL2_Init();
 
 		initialized = true;
 	}
 
-	void gui_on_frame()
+	static void gui_on_frame()
 	{
 		new_frame();
 		draw_menu();
@@ -76,7 +82,7 @@ namespace imgui
 		ImGui::NewFrame();
 	}
 	
-	void menu_loads_settings()
+	static void menu_loads_settings()
 	{
 		sensitivity_adsScaleEnable = movement::sensitivity_adsScaleEnable->integer;
 		sensitivity_adsScale = movement::sensitivity_adsScale->value;
@@ -88,7 +94,8 @@ namespace imgui
 		cg_chatHeight = monitoring::cg_chatHeight->integer;
 		con_boldgamemessagetime = monitoring::con_boldgamemessagetime->integer;
 		cg_lagometer = monitoring::cg_lagometer->integer;
-		cl_allowDownload = security::cl_allowDownload->integer;
+		cl_allowDownload = !security::cl_allowDownload->integer;
+		m_rawinput = movement::m_rawinput->integer;
 	}
 
 	void draw_menu()
@@ -102,7 +109,7 @@ namespace imgui
 
 		//// Security
 		ImGui::SeparatorText("Security");
-		ImGui::Checkbox("Downloading", &cl_allowDownload);
+		ImGui::Checkbox("Deny downloads", &cl_allowDownload);
 		////
 
 		// Spacing
@@ -131,8 +138,12 @@ namespace imgui
 		// Spacing
 		ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-		//// ADS
-		ImGui::SeparatorText("Aim Down Sight");
+		//// Movement
+		ImGui::SeparatorText("Movement");
+		ImGui::Checkbox("Raw mouse input", &m_rawinput);
+
+		ImGui::Spacing();
+
 		// Sensitivity multiplier
 		ImGui::Checkbox("Sensitivity multiplier", &sensitivity_adsScaleEnable);
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
@@ -170,7 +181,8 @@ namespace imgui
 		game::Cvar_Set(monitoring::cg_chatHeight->name, utils::string::va("%i", cg_chatHeight));
 		game::Cvar_Set(monitoring::con_boldgamemessagetime->name, utils::string::va("%i", con_boldgamemessagetime));
 		game::Cvar_Set(monitoring::cg_lagometer->name, cg_lagometer ? "1" : "0");
-		game::Cvar_Set(security::cl_allowDownload->name, cl_allowDownload ? "1" : "0");
+		game::Cvar_Set(security::cl_allowDownload->name, cl_allowDownload ? "0" : "1");
+		game::Cvar_Set(movement::m_rawinput->name, m_rawinput ? "1" : "0");
 	}
 
 	void end_frame()

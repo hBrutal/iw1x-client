@@ -18,12 +18,14 @@ namespace game
 	WEAK symbol<void()> CG_ServerCommand{ 0, 0x3002e0d0, OFFSET_CGAME_MP };
 	WEAK symbol<void(const char* cmd_name, xcommand_t function)> Cmd_AddCommand{ 0, 0x00428840 };
 	WEAK symbol<void(int code, const char* fmt, ...)> Com_Error{ 0, 0x00435ad0 };
+	WEAK symbol<void()> IN_MouseMove{ 0, 0x00461850 };
+	WEAK symbol<void(int mstate)> IN_MouseEvent{ 0, 0x004617d0 };
 
 
 
 
 
 
-	//WEAK symbol<void()> IN_MouseMove{ 0, 0x00461850 };
+
 	//WEAK symbol<int(vm_t* vm, int callnum, ...)> VM_Call{ 0, 0x00460480 };
 }

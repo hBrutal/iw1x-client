@@ -142,22 +142,7 @@ namespace scheduler
 			return cond_end;
 		}, type, delay);
 	}
-#if 0
-	void on_game_initialized(const std::function<void()>& callback, const pipeline type, const std::chrono::milliseconds delay)
-	{
-		schedule([=]()
-		{
-			/*const auto dw_init = game::environment::is_sp() ? true : game::Live_SyncOnlineDataFlags(0) == 0;
-			if (dw_init && game::Sys_IsDatabaseReady2())
-			{
-				once(callback, type, delay);
-				return cond_end;
-			}*/
 
-			return cond_continue;
-		}, pipeline::main);
-	}
-#endif
 	class component final : public component_interface
 	{
 	public:
