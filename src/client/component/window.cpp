@@ -118,6 +118,9 @@ namespace window
 			return;
 		if (*game::cls_keyCatchers & KEYCATCH_UI || *game::cls_keyCatchers & KEYCATCH_CONSOLE)
 			return;
+		// Prevent view from moving after coming back from another window
+		if (GetForegroundWindow() != *game::hWnd)
+			return;
 		
 		UINT dwSize = sizeof(RAWINPUT);
 		static RAWINPUT raw;
@@ -167,7 +170,8 @@ namespace window
 				return 0;
 
 			/*
-			If console is open when closing imgui, console's text field loses focus because of the Alt press, and the (non visible) system menu obtains the focus
+			When closing imgui, if game is windowed and console is open,
+			console's text field might lose focus because of the Alt press, and the (non visible) system menu woult obtain it
 			Returning here prevents this
 			*/
 			if (*game::cls_keyCatchers & KEYCATCH_CONSOLE)
