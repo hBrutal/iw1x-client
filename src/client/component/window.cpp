@@ -22,6 +22,7 @@ namespace window
 	HHOOK hHook;
 
 	game::cvar_t* r_fullscreen;
+	game::cvar_t* cl_bypassMouseInput;
 
 	utils::hook::detour Com_Init_hook;
 	utils::hook::detour IN_MouseMove_hook;
@@ -104,7 +105,7 @@ namespace window
 	
 	static void IN_MouseMove_stub()
 	{
-		// Apply raw input only for player move
+		// Apply raw input only when player can move
 		if (movement::m_rawinput->integer)
 		{
 			if (*game::cls_keyCatchers == 0) // TODO: Figure out why have to use "== 0" instead of "& KEYCATCH_CGAME"
@@ -112,10 +113,17 @@ namespace window
 				rawInput_move();
 				return;
 			}
+
+			// If a .menu is displayed, and cl_bypassMouseInput is enabled, player can move (e.g. wm_quickmessage.menu)
+			if ((*game::cls_keyCatchers & KEYCATCH_UI) && cl_bypassMouseInput->integer)
+			{
+				rawInput_move();
+				return;
+			}
 			
 			if (r_fullscreen->integer && *game::cgvm != NULL)
 			{
-				// .menu + console open = no player move
+				// .menu + console opened = player can't move
 				if (*game::cls_keyCatchers == 3)
 				{
 					IN_MouseMove_hook.invoke();
@@ -135,21 +143,19 @@ namespace window
 	
 	static void WM_INPUT_process(LPARAM lParam)
 	{
-		//// Prevent view from moving after closing:
-		// imgui
+		//// Don't update raw input when
 		if (imgui::displayed)
 			return;
-		// .menu
-		if (*game::cls_keyCatchers & KEYCATCH_UI)
+		// a .menu is displayed (except if it uses cl_bypassMouseInput)
+		if (*game::cls_keyCatchers & KEYCATCH_UI && !cl_bypassMouseInput->integer)
 			return;
-		// console when windowed
+		// console is opened and game is windowed
 		if (*game::cls_keyCatchers & KEYCATCH_CONSOLE && !r_fullscreen->integer)
 			return;
-		////
-		
-		// Prevent view from moving after coming back from another window
+		// using another window
 		if (GetForegroundWindow() != *game::hWnd)
 			return;
+		////
 		
 		UINT dwSize = sizeof(RAWINPUT);
 		static RAWINPUT raw;
@@ -225,6 +231,7 @@ namespace window
 		void post_unpack() override
 		{
 			r_fullscreen = game::Cvar_Get("r_fullscreen", "0", CVAR_ARCHIVE | CVAR_LATCH);
+			cl_bypassMouseInput = game::Cvar_Get("cl_bypassMouseInput", "0", 0);
 
 			utils::hook::set(0x4639b9 + 1, MainWndProc_stub);
 			utils::hook::set(0x5083b1, 0x00); // Alt+Tab support, see https://github.com/xtnded/codextended-client/pull/1
