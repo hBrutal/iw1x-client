@@ -136,6 +136,12 @@ namespace window
 					return;
 				}
 			}
+
+			if (*game::cls_keyCatchers & KEYCATCH_MESSAGE)
+			{
+				rawInput_move();
+				return;
+			}
 		}
 
 		IN_MouseMove_hook.invoke();
