@@ -13,4 +13,5 @@ ___
 - [CoDPlusPlus](https://github.com/kartjom/CoDPlusPlus)
 - [AlterWare](https://alterware.dev/)
 - [Aurora](https://auroramod.dev/)
+- [iw4x-client](https://github.com/iw4x/iw4x-client)
 - [RTCW-MP](https://github.com/id-Software/RTCW-MP/)
