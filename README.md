@@ -2,8 +2,7 @@
 ### Adding security, fixes, and features
 Supported game version: **1.1**
 ___
-<img src="https://github.com/user-attachments/assets/0d3f5ebf-7bab-49b0-b04b-c895269bf831" width="100%">
-
+![screenshot](https://github.com/user-attachments/assets/11c970e9-4710-4c47-bc87-03f326d0ba5c)
 ___
 ### Usage and Build steps
 See the [Wiki](https://github.com/raphael12333/cod-mod/wiki)
