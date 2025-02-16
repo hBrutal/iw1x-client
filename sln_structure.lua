@@ -27,7 +27,7 @@ end
 
 dependencies.load()
 
-workspace "cod-mod"
+workspace "iw1x-client"
 configurations { "Debug", "Release" }
 platforms "Win32"
 architecture "x86"
@@ -71,7 +71,7 @@ fatalwarnings { "All" }
 -- Project: client
 project "client"
 kind "WindowedApp"
-targetname "cod-mod"
+targetname "iw1x"
 pchheader "std_include.hpp"
 pchsource "src/client/std_include.cpp"
 linkoptions { "/DYNAMICBASE:NO", "/SAFESEH:NO", "/LARGEADDRESSAWARE", "/LAST:._text", "/PDBCompress" }

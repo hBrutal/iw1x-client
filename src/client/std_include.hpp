@@ -24,7 +24,7 @@ SizeOfImage - SizeOfHeaders
 #undef min
 #endif
 
-#define MOD_NAME "cod-mod"
+#define MOD_NAME "iw1x"
 
 #define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONINFORMATION);
 #define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONWARNING);

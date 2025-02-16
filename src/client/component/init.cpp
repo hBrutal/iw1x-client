@@ -63,7 +63,7 @@ namespace init
 		auto* orig = static_cast<decltype(GetModuleFileNameA)*>(nt_GetModuleFileNameA_hook.get_original());
 		auto ret = orig(hModule, lpFilename, nSize);
 		
-		if (!strcmp(PathFindFileNameA(lpFilename), "cod-mod.exe"))
+		if (!strcmp(PathFindFileNameA(lpFilename), "iw1x.exe"))
 		{
 			std::filesystem::path path = lpFilename;
 			auto binary = game::environment::get_client_filename();
@@ -85,7 +85,7 @@ namespace init
 		std::string pathStr(required_size - 1, '\0');
 		WideCharToMultiByte(CP_UTF8, 0, lpFilename, -1, pathStr.data(), required_size, nullptr, nullptr);
 
-		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "cod-mod.exe"))
+		if (!strcmp(PathFindFileNameA(pathStr.c_str()), "iw1x.exe"))
 		{
 			std::filesystem::path pathFs = pathStr;
 

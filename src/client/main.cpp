@@ -55,7 +55,7 @@ static FARPROC load_binary()
 
     std::string data;
     if (!utils::io::read_file(client_filename, &data))
-        throw std::runtime_error(utils::string::va("Failed to read %s\nIs cod-mod in your Call of Duty folder?", client_filename.data()));
+        throw std::runtime_error(utils::string::va("Failed to read %s\niw1x is in your CoD folder?", client_filename.data()));
 
     return loader.load(self, data);
 }
