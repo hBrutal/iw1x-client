@@ -1,4 +1,4 @@
-# Modification for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game)) Multiplayer client
+# Modifications for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game)) Multiplayer client
 ### Adding security, fixes, and features
 Supported game version: **1.1**
 ___
