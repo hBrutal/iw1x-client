@@ -2,7 +2,7 @@
 ### Adding security, fixes, and features
 Supported game version: **1.1**
 ___
-![screenshot](https://github.com/user-attachments/assets/11c970e9-4710-4c47-bc87-03f326d0ba5c)
+![preview](https://github.com/user-attachments/assets/d18e55e4-a588-45e7-a737-624297a96335)
 ___
 ### Usage and Build steps
 See the [Wiki](https://github.com/raphael12333/iw1x-client/wiki)
