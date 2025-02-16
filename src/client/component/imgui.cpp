@@ -8,6 +8,7 @@
 #include "security.hpp"
 #include "monitoring.hpp"
 #include "movement.hpp"
+#include "view.hpp"
 
 namespace imgui
 {
@@ -19,9 +20,9 @@ namespace imgui
 	HWND hWnd_during_init;
 
 	bool sensitivity_adsScaleEnable = false;
-	float sensitivity_adsScale = 0.0f;
+	float sensitivity_adsScale = 0.f;
 	bool sensitivity_adsScaleSniperEnable = false;
-	float sensitivity_adsScaleSniper = 0.0f;
+	float sensitivity_adsScaleSniper = 0.f;
 	bool cg_drawDisconnect = true;
 	bool cg_drawWeaponSelect = true;
 	bool cg_drawFPS = false;
@@ -30,6 +31,7 @@ namespace imgui
 	bool cg_lagometer = false;
 	bool cl_allowDownload = false;
 	bool m_rawinput = false;
+	float cg_fov = 80.f;
 
 	void toggle_menu_flag()
 	{
@@ -96,6 +98,7 @@ namespace imgui
 		cg_lagometer = monitoring::cg_lagometer->integer;
 		cl_allowDownload = !security::cl_allowDownload->integer;
 		m_rawinput = movement::m_rawinput->integer;
+		cg_fov = view::cg_fov->value;
 	}
 
 	void draw_menu()
@@ -113,10 +116,10 @@ namespace imgui
 		////
 
 		// Spacing
-		ImGui::Dummy(ImVec2(0.0f, 10.0f));
+		ImGui::Dummy(ImVec2(0, 10));
 
-		//// Interface
-		ImGui::SeparatorText("Interface");
+		//// UI
+		ImGui::SeparatorText("UI");
 		ImGui::Checkbox("FPS", &cg_drawFPS);
 		ImGui::Checkbox("Lagometer", &cg_lagometer);
 		ImGui::Checkbox("\"Connection Interrupted\"", &cg_drawDisconnect);
@@ -135,8 +138,15 @@ namespace imgui
 		ImGui::SliderInt("##slider_con_boldgamemessagetime", &con_boldgamemessagetime, 0, 8, "%i", ImGuiSliderFlags_NoInput);
 		////
 
+		//// View
+		ImGui::SeparatorText("View");
+		ImGui::Text("FOV");
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		ImGui::SliderFloat("##slider_cg_fov", &cg_fov, 80.f, 95.f, "%.2f", ImGuiSliderFlags_NoInput);
+		////
+
 		// Spacing
-		ImGui::Dummy(ImVec2(0.0f, 10.0f));
+		ImGui::Dummy(ImVec2(0, 10));
 
 		//// Movement
 		ImGui::SeparatorText("Movement");
@@ -183,6 +193,7 @@ namespace imgui
 		game::Cvar_Set(monitoring::cg_lagometer->name, cg_lagometer ? "1" : "0");
 		game::Cvar_Set(security::cl_allowDownload->name, cl_allowDownload ? "0" : "1");
 		game::Cvar_Set(movement::m_rawinput->name, m_rawinput ? "1" : "0");
+		game::Cvar_Set(view::cg_fov->name, utils::string::va("%.2f", cg_fov));
 	}
 
 	void end_frame()
