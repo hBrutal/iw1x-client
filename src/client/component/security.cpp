@@ -8,12 +8,12 @@
 
 namespace security
 {
-	utils::hook::detour CG_ServerCommand_hook;
-	utils::hook::detour CL_SystemInfoChanged_hook;
-
 	game::cvar_t* cl_allowDownload;
 
-	std::vector<std::string> cvarsWhiteList =
+	utils::hook::detour CG_ServerCommand_hook;
+	utils::hook::detour CL_SystemInfoChanged_hook;
+	
+	std::vector<std::string> cvarsWritable_whiteList =
 	{
 		"g_scriptMainMenu",
 		"scr_showweapontab",
@@ -26,7 +26,7 @@ namespace security
 
 	static bool cvarIsInWhitelist(const char* cvar_name)
 	{
-		for (const auto& str : cvarsWhiteList)
+		for (const auto& str : cvarsWritable_whiteList)
 			if (!_stricmp(str.c_str(), cvar_name))
 				return true;
 		return false;
@@ -69,11 +69,11 @@ namespace security
 	{
 		_asm
 		{
-			mov ebx, key
-			mov ecx, buffer
+			mov ebx, key;
+			mov ecx, buffer;
 
-			mov eax, 0x0044ada0
-			call eax
+			mov eax, 0x0044ada0;
+			call eax;
 		}
 	}
 

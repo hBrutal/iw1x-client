@@ -1,18 +1,5 @@
 #pragma once
 
-constexpr auto MAX_STRING_CHARS = 1024;
-constexpr auto MAX_WEAPONS = 64;
-
-constexpr auto CVAR_ARCHIVE = 1;
-constexpr auto CVAR_LATCH = 32;
-
-constexpr auto KEYCATCH_CONSOLE = 0x0001;
-constexpr auto KEYCATCH_UI = 0x0002;
-constexpr auto KEYCATCH_MESSAGE = 0x0004;
-constexpr auto KEYCATCH_CGAME = 0x0008;
-
-constexpr auto YAW = 1;
-
 namespace game
 {
 	typedef unsigned char byte;

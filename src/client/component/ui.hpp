@@ -1,6 +1,6 @@
 #pragma once
 
-namespace monitoring
+namespace ui
 {
 	extern game::cvar_t* cg_drawFPS;
 	extern game::cvar_t* cg_lagometer;

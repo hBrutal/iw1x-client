@@ -42,14 +42,11 @@ static FARPROC load_binary()
             
             return component_loader::load_import(library, function);
         });
-
+    
     // Check if the CoD file is named mohaa
-    char path[MAX_PATH];
-    GetModuleFileNameA(NULL, path, sizeof(path));
-    std::filesystem::path pathFs = path;
-    pathFs.replace_filename("mohaa.exe");
-    if (utils::io::file_exists(pathFs.string()))
-        game::environment::set_mohaa();
+    std::filesystem::path currentPath_mohaa_test = std::filesystem::current_path() / "mohaa.exe";
+    if (utils::io::file_exists(currentPath_mohaa_test.string()))
+        game::environment::mohaa = true;
 
     auto client_filename = game::environment::get_client_filename();
 
@@ -68,18 +65,15 @@ static void enable_dpi_awareness()
         set_dpi(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 }
 
-static void remove_crash_file()
-{
-    utils::io::remove_file("__codmp");
-}
-
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
     //SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
     enable_dpi_awareness();
 
 #ifdef DEBUG
-    remove_crash_file();
+    // Delete crash file
+    DeleteFileA("__codmp");
+    DeleteFileA("__mohaa");
 #endif
 
     auto premature_shutdown = true;

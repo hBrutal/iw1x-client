@@ -77,7 +77,7 @@ namespace window
 			throw std::runtime_error("RegisterRawInputDevices failed");
 	}
 	
-	int CL_MouseEvent_addr = 0x0040b0a0;
+	uintptr_t CL_MouseEvent_addr = 0x0040b0a0;
 	static void CL_MouseEvent(int _dx, int _dy)
 	{
 		_asm
@@ -222,7 +222,7 @@ namespace window
 		return game::MainWndProc(hWnd, uMsg, wParam, lParam);
 	}
 	
-	void Com_Init_stub(char* commandLine)
+	static void Com_Init_stub(char* commandLine)
 	{
 		hHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
 		if (!hHook)

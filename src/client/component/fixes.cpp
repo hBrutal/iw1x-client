@@ -8,35 +8,36 @@ namespace fixes
 {
 	utils::hook::detour UI_StartServerRefresh_hook;
 	
-	// See https://github.com/xtnded/codextended-client/blob/45af251518a390ab08b1c8713a6a1544b70114a1/cl_input.cpp#L77
-	auto pfield_charevent_return = 0x40CB77;
-	auto pfield_charevent_continue = 0x40CB23;
-	const auto Field_CharEvent_ignore_console_char_stub = utils::hook::assemble([](utils::hook::assembler& a)
+	uintptr_t pfield_charevent_return = 0x40CB77;
+	uintptr_t pfield_charevent_continue = 0x40CB23;
+	static __declspec(naked) void Field_CharEvent_ignore_console_char_stub()
+	{
+		// See https://github.com/xtnded/codextended-client/blob/45af251518a390ab08b1c8713a6a1544b70114a1/cl_input.cpp#L77
+		
+		__asm
 		{
-			const auto check = a.newLabel();
-			const auto checked = a.newLabel();
-
-			a.cmp(ebx, 0x20);
-			a.jge(check);
-			a.jmp(pfield_charevent_return);
-
-			a.bind(check);
-			a.cmp(ebx, 126);
-			a.jl(checked);
-			a.jmp(pfield_charevent_return);
-
-			a.bind(checked);
-			a.jmp(pfield_charevent_continue);
-		});
+			cmp ebx, 20h;
+			jge check;
+			jmp pfield_charevent_return;
+		
+		check:
+			cmp ebx, 126;
+			jl checked;
+			jmp pfield_charevent_return;
+		
+		checked:
+			jmp pfield_charevent_continue;
+		}
+	}
 	
-	void UI_StartServerRefresh_stub(game::qboolean full)
+	static void UI_StartServerRefresh_stub(game::qboolean full)
 	{
 		if (*game::refreshActive)
 			return;
 		UI_StartServerRefresh_hook.invoke(full);
 	}
 
-	char* Q_CleanStr_keep_colors(char* string)
+	static char* Q_CleanStr_keep_colors(char* string)
 	{
 		char* d;
 		char* s;
@@ -57,7 +58,7 @@ namespace fixes
 		*d = '\0';
 		return string;
 	}
-	char* CL_SetServerInfo_hostname_strncpy_stub(char* dest, const char* src, int destsize)
+	static char* CL_SetServerInfo_hostname_strncpy_stub(char* dest, const char* src, int destsize)
 	{
 		char hostname[MAX_STRING_CHARS];
 		strncpy_s(hostname, sizeof(hostname), src, _TRUNCATE);
@@ -72,7 +73,7 @@ namespace fixes
 	void ready_hook_ui_mp()
 	{
 		// Prevent displaying servers twice (occurs if double click Refresh List)
-		UI_StartServerRefresh_hook.create(ABSOLUTE_UI_MP(0x4000ea90), UI_StartServerRefresh_stub);		
+		UI_StartServerRefresh_hook.create(ABSOLUTE_UI_MP(0x4000ea90), UI_StartServerRefresh_stub);
 	}
 	
 	class component final : public component_interface

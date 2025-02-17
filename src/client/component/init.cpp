@@ -5,8 +5,9 @@
 
 #include "security.hpp"
 #include "fixes.hpp"
-#include "monitoring.hpp"
+#include "ui.hpp"
 #include "movement.hpp"
+#include "view.hpp"
 
 DWORD address_cgame_mp;
 DWORD address_ui_mp;
@@ -19,8 +20,11 @@ namespace init
 	void hook_dll_cgame_mp()
 	{
 		security::ready_hook_cgame_mp();
-		monitoring::ready_hook_cgame_mp();
+		ui::ready_hook_cgame_mp();
 		movement::ready_hook_cgame_mp();
+
+
+		view::ready_hook_cgame_mp();
 	}
 
 	void hook_dll_ui_mp()

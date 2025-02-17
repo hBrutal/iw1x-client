@@ -6,7 +6,7 @@
 #include "imgui.hpp"
 
 #include "security.hpp"
-#include "monitoring.hpp"
+#include "ui.hpp"
 #include "movement.hpp"
 #include "view.hpp"
 
@@ -26,13 +26,15 @@ namespace imgui
 	bool cg_drawDisconnect = true;
 	bool cg_drawWeaponSelect = true;
 	bool cg_drawFPS = false;
-	int cg_chatHeight = 8;
-	int con_boldgamemessagetime = 8;
+	int cg_chatHeight = 0;
+	int con_boldgamemessagetime = 0;
 	bool cg_lagometer = false;
 	bool cl_allowDownload = false;
 	bool m_rawinput = false;
-	float cg_fov = 80.f;
-
+	float cg_fov = 0.f;
+	bool cg_fovScaleEnable = false;
+	float cg_fovScale = 0.f;
+	
 	void toggle_menu_flag()
 	{
 		if (!displayed)
@@ -59,8 +61,9 @@ namespace imgui
 		ImGui::CreateContext();
 
 		ImGuiIO& io = ImGui::GetIO();
-		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Verdana.ttf", 16.0f);
 		ImGuiStyle& style = ImGui::GetStyle();
+
+		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Verdana.ttf", 16.0f);
 		style.WindowPadding.x += 8;
 		style.WindowPadding.y += 7;
 
@@ -90,15 +93,17 @@ namespace imgui
 		sensitivity_adsScale = movement::sensitivity_adsScale->value;
 		sensitivity_adsScaleSniperEnable = movement::sensitivity_adsScaleSniperEnable->value;
 		sensitivity_adsScaleSniper = movement::sensitivity_adsScaleSniper->value;
-		cg_drawDisconnect = monitoring::cg_drawDisconnect->integer;
-		cg_drawWeaponSelect = monitoring::cg_drawWeaponSelect->integer;
-		cg_drawFPS = monitoring::cg_drawFPS->integer;
-		cg_chatHeight = monitoring::cg_chatHeight->integer;
-		con_boldgamemessagetime = monitoring::con_boldgamemessagetime->integer;
-		cg_lagometer = monitoring::cg_lagometer->integer;
+		cg_drawDisconnect = ui::cg_drawDisconnect->integer;
+		cg_drawWeaponSelect = ui::cg_drawWeaponSelect->integer;
+		cg_drawFPS = ui::cg_drawFPS->integer;
+		cg_chatHeight = ui::cg_chatHeight->integer;
+		con_boldgamemessagetime = ui::con_boldgamemessagetime->integer;
+		cg_lagometer = ui::cg_lagometer->integer;
 		cl_allowDownload = !security::cl_allowDownload->integer;
 		m_rawinput = movement::m_rawinput->integer;
 		cg_fov = view::cg_fov->value;
+		cg_fovScaleEnable = view::cg_fovScaleEnable->integer;
+		cg_fovScale = view::cg_fovScale->value;
 	}
 
 	void draw_menu()
@@ -106,19 +111,20 @@ namespace imgui
 		menu_loads_settings();
 
 		ImGui::SetNextWindowSize(ImVec2(300, 0));
-		ImGui::SetNextWindowPos(ImVec2(50, 200), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(25, 80), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowFocus();
 		ImGui::Begin(MOD_NAME, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 
 		//// Security
+
 		ImGui::SeparatorText("Security");
 		ImGui::Checkbox("Deny downloads", &cl_allowDownload);
 		////
 
-		// Spacing
-		ImGui::Dummy(ImVec2(0, 10));
+		ImGui::Dummy(ImVec2(0, 10)); // Spacing
 
 		//// UI
+
 		ImGui::SeparatorText("UI");
 		ImGui::Checkbox("FPS", &cg_drawFPS);
 		ImGui::Checkbox("Lagometer", &cg_lagometer);
@@ -139,16 +145,27 @@ namespace imgui
 		////
 
 		//// View
+
 		ImGui::SeparatorText("View");
 		ImGui::Text("FOV");
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		ImGui::SliderFloat("##slider_cg_fov", &cg_fov, 80.f, 95.f, "%.2f", ImGuiSliderFlags_NoInput);
+		
+		ImGui::Spacing();
+		
+		ImGui::Checkbox("FOV scale", &cg_fovScaleEnable);
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		if (!cg_fovScaleEnable)
+			ImGui::BeginDisabled();
+		ImGui::SliderFloat("##slider_cg_fovScale", &cg_fovScale, 1.f, 1.4f, "%.2f", ImGuiSliderFlags_NoInput);
+		if (!cg_fovScaleEnable)
+			ImGui::EndDisabled();
 		////
-
-		// Spacing
-		ImGui::Dummy(ImVec2(0, 10));
+		
+		ImGui::Dummy(ImVec2(0, 10)); // Spacing
 
 		//// Movement
+
 		ImGui::SeparatorText("Movement");
 		ImGui::Checkbox("Raw mouse input", &m_rawinput);
 
@@ -159,7 +176,7 @@ namespace imgui
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		if (!sensitivity_adsScaleEnable)
 			ImGui::BeginDisabled();
-		ImGui::SliderFloat("##slider_sensitivity_adsScale", &sensitivity_adsScale, 0.15f, 1.30f, "%.2f", ImGuiSliderFlags_NoInput);
+		ImGui::SliderFloat("##slider_sensitivity_adsScale", &sensitivity_adsScale, 0.15f, 1.f, "%.2f", ImGuiSliderFlags_NoInput);
 		if (!sensitivity_adsScaleEnable)
 			ImGui::EndDisabled();
 
@@ -170,7 +187,7 @@ namespace imgui
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		if (!sensitivity_adsScaleSniperEnable)
 			ImGui::BeginDisabled();
-		ImGui::SliderFloat("##slider_sensitivity_adsScaleSniper", &sensitivity_adsScaleSniper, 0.15f, 1.30f, "%.2f", ImGuiSliderFlags_NoInput);
+		ImGui::SliderFloat("##slider_sensitivity_adsScaleSniper", &sensitivity_adsScaleSniper, 0.15f, 1.f, "%.2f", ImGuiSliderFlags_NoInput);
 		if (!sensitivity_adsScaleSniperEnable)
 			ImGui::EndDisabled();
 		////
@@ -185,15 +202,17 @@ namespace imgui
 		game::Cvar_Set(movement::sensitivity_adsScale->name, utils::string::va("%.2f", sensitivity_adsScale));
 		game::Cvar_Set(movement::sensitivity_adsScaleSniperEnable->name, sensitivity_adsScaleSniperEnable ? "1" : "0");
 		game::Cvar_Set(movement::sensitivity_adsScaleSniper->name, utils::string::va("%.2f", sensitivity_adsScaleSniper));
-		game::Cvar_Set(monitoring::cg_drawDisconnect->name, cg_drawDisconnect ? "1" : "0");
-		game::Cvar_Set(monitoring::cg_drawWeaponSelect->name, cg_drawWeaponSelect ? "1" : "0");
-		game::Cvar_Set(monitoring::cg_drawFPS->name, cg_drawFPS ? "1" : "0");
-		game::Cvar_Set(monitoring::cg_chatHeight->name, utils::string::va("%i", cg_chatHeight));
-		game::Cvar_Set(monitoring::con_boldgamemessagetime->name, utils::string::va("%i", con_boldgamemessagetime));
-		game::Cvar_Set(monitoring::cg_lagometer->name, cg_lagometer ? "1" : "0");
+		game::Cvar_Set(ui::cg_drawDisconnect->name, cg_drawDisconnect ? "1" : "0");
+		game::Cvar_Set(ui::cg_drawWeaponSelect->name, cg_drawWeaponSelect ? "1" : "0");
+		game::Cvar_Set(ui::cg_drawFPS->name, cg_drawFPS ? "1" : "0");
+		game::Cvar_Set(ui::cg_chatHeight->name, utils::string::va("%i", cg_chatHeight));
+		game::Cvar_Set(ui::con_boldgamemessagetime->name, utils::string::va("%i", con_boldgamemessagetime));
+		game::Cvar_Set(ui::cg_lagometer->name, cg_lagometer ? "1" : "0");
 		game::Cvar_Set(security::cl_allowDownload->name, cl_allowDownload ? "0" : "1");
 		game::Cvar_Set(movement::m_rawinput->name, m_rawinput ? "1" : "0");
 		game::Cvar_Set(view::cg_fov->name, utils::string::va("%.2f", cg_fov));
+		game::Cvar_Set(view::cg_fovScaleEnable->name, cg_fovScaleEnable ? "1" : "0");
+		game::Cvar_Set(view::cg_fovScale->name, utils::string::va("%.2f", cg_fovScale));
 	}
 
 	void end_frame()

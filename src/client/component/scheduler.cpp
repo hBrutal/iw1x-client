@@ -98,9 +98,8 @@ namespace scheduler
 			r_end_frame_hook.invoke<void>(frontEndMsec, backEndMsec);
 		}
 
-		void server_frame_stub(int msec)
+		void SV_Frame_stub(int msec)
 		{
-			//game::G_Glass_Update();
 			game::SV_Frame(msec);
 			execute(pipeline::server);
 		}
@@ -162,7 +161,7 @@ namespace scheduler
 		{
 			r_end_frame_hook.create(reinterpret_cast<void(*)(int*, int*)>(0x004de4b0), r_end_frame_stub); // RE_EndFrame
 			utils::hook::call(0x0046426f, main_frame_stub); // Com_Frame
-			utils::hook::call(reinterpret_cast<void(*)(int)>(0x004380df), server_frame_stub); // SV_Frame
+			utils::hook::call(reinterpret_cast<void(*)(int)>(0x004380df), SV_Frame_stub);
 		}
 
 		void pre_destroy() override

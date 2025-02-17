@@ -21,24 +21,13 @@ namespace game
 	
 	namespace environment
 	{
-		bool mohaa;
-
+		bool mohaa = false;
 		std::string get_client_filename()
 		{
-			if (is_mohaa())
+			if (mohaa)
 				return "mohaa.exe";
 			else
-				return "CoDMP.exe";
-		}
-
-		bool is_mohaa()
-		{
-			return mohaa;
-		}
-
-		void set_mohaa()
-		{
-			mohaa = true;
+				return "codmp.exe";
 		}
 	}
 }

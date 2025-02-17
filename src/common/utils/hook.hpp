@@ -2,24 +2,8 @@
 
 #include "nt.hpp"
 
-#include <asmjit/core/jitruntime.h>
-#include <asmjit/x86/x86assembler.h>
-
-using namespace asmjit::x86;
-
 namespace utils::hook
 {
-    class assembler : public Assembler
-    {
-    public:
-        using Assembler::Assembler;
-        using Assembler::call;
-        using Assembler::jmp;
-
-        asmjit::Error call(void* target);
-        asmjit::Error jmp(void* target);
-    };
-
     class detour
     {
     public:
@@ -88,8 +72,6 @@ namespace utils::hook
     void jump(void* pointer, void* data);
     void jump(size_t pointer, void* data);
     void jump(size_t pointer, size_t data);
-
-    void* assemble(const std::function<void(assembler&)>& asm_function);
 
     void inject(void* pointer, const void* data);
     void inject(size_t pointer, const void* data);

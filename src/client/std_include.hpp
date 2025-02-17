@@ -44,9 +44,6 @@ SizeOfImage - SizeOfHeaders
 #include <backends/imgui_impl_opengl2.h>
 #include <backends/imgui_impl_win32.h>
 
-#include <asmjit/core/jitruntime.h>
-#include <asmjit/x86/x86assembler.h>
-
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
 #pragma comment(lib, "opengl32.lib")

@@ -5,11 +5,11 @@
 extern DWORD address_cgame_mp;
 extern DWORD address_ui_mp;
 
-#define OFFSET_CGAME_MP 0x30000000
-#define OFFSET_UI_MP	0x40000000
+constexpr auto BASE_CGAME_MP = 0x30000000;
+constexpr auto BASE_UI_MP = 0x40000000;
 
-#define ABSOLUTE_CGAME_MP(relative) (address_cgame_mp + (relative - OFFSET_CGAME_MP))
-#define ABSOLUTE_UI_MP(relative)	(address_ui_mp + (relative - OFFSET_UI_MP))
+#define ABSOLUTE_CGAME_MP(relative) (address_cgame_mp + (relative - BASE_CGAME_MP))
+#define ABSOLUTE_UI_MP(relative)	(address_ui_mp + (relative - BASE_UI_MP))
 
 //#define SP_OR_MP(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
 
@@ -18,10 +18,7 @@ namespace game
 	namespace environment
 	{
 		std::string get_client_filename();
-
-
-		bool is_mohaa();
-		void set_mohaa();
+		extern bool mohaa;
 	}
 
 	template <typename T>
@@ -42,10 +39,10 @@ namespace game
 
 			switch (offset)
 			{
-			case OFFSET_CGAME_MP:
+			case BASE_CGAME_MP:
 				base_address = address_cgame_mp;
 				break;
-			case OFFSET_UI_MP:
+			case BASE_UI_MP:
 				base_address = address_ui_mp;
 				break;
 			default:
@@ -72,7 +69,6 @@ namespace game
 	
 	int Cmd_Argc();
 	char* Cmd_Argv(int arg);
-	
 	game::weaponInfo_t* BG_GetInfoForWeapon(int weaponNum);
 }
 
