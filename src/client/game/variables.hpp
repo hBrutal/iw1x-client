@@ -35,10 +35,11 @@ namespace game
 	WEAK symbol<qboolean> clc_demoplaying{ 0, 0x015ef004 };
 	WEAK symbol<vm_t*> cgvm{ 0, 0x01617348 };
 
+	WEAK symbol<int> vidWidth{ 0, 0x16C3AE4 };
+	WEAK symbol<int> vidHeight{ 0, 0x16C3AE8 };
+	WEAK symbol<int> glconfig_vidWidth{ 0, 0x15CA614 };
+	WEAK symbol<int> glconfig_vidHeight{ 0, 0x15CA618 };
 
-	
-	
-	
 	//WEAK symbol<connstate_t> cls_state{ 0, 0x155F2C0 };
 	//WEAK symbol<vm_t*> uivm{ 0, 0x0161747c };
 }
