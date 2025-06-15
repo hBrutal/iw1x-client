@@ -15,10 +15,10 @@ namespace scope
 	{
 		float screenW = static_cast<float>(*game::cg_refdef_width);
 		float screenH = static_cast<float>(*game::cg_refdef_height);
-		float screenAspect = screenW / screenH;
-		float baseAspect = 1.3333334f;
-		float baseWidth = screenH * baseAspect;
-		float offset =screenW - baseWidth;
+//		float screenAspect = screenW / screenH;
+//		float baseAspect = 1.3333334f;
+//		float baseWidth = screenH * baseAspect;
+//		float offset =screenW - baseWidth;
 
 		auto BlackShader = (game::qhandle_t)(*game::cgame_mp::syscall)(game::CG_R_REGISTERSHADERNOMIP, "black", 0);
 		float background_color[4] = { 0, 0, 0, 1.0f };
