@@ -1,14 +1,16 @@
 #pragma once
-
 namespace scheduler
 {
+	using namespace std::literals;
+
 	enum pipeline
 	{
-		async = 0,	// Asynchronuous pipeline, disconnected from the game
-		renderer,	// The game's rendering pipeline
-		server,		// The game's server thread
-		main,		// The game's main thread
-		count,
+		client,
+		server,
+		cgame,
+		renderer,
+		async,
+		count
 	};
 
 	static const bool cond_continue = false;

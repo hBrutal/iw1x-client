@@ -1,202 +1,190 @@
-#include <std_include.hpp>
-#if 1
+﻿#include <std_include.hpp>
 #include "loader/component_loader.hpp"
-#include <utils/hook.hpp>
-#include "game/game.hpp"
 
-#include <utils/string.hpp>
-
+#include "ui.hpp"
 #include "scheduler.hpp"
+
+#include <utils/hook.hpp>
+#include <utils/string.hpp>
 
 namespace ui
 {
 	game::cvar_t* branding;
-	game::cvar_t* cg_drawDisconnect;
-	game::cvar_t* cg_drawWeaponSelect;
-	game::cvar_t* cg_drawFPS;
-	game::cvar_t* cg_lagometer;
-	game::cvar_t* cg_chatHeight;
-	game::cvar_t* con_boldgamemessagetime;
-	game::cvar_t* cg_Obituary;				// enable/disable kills and deaths in killfeed
-	game::cvar_t* cg_WhiteText;				// enable/disable white text in killfeed
-	game::cvar_t* cg_ObituaryColor;			// enable/disable colour text in killfeed
+	game::cvar_t* cg_Speedometer;
+	game::cvar_t* cg_drawFPS_custom;
+	game::cvar_t* cg_drawPing;
+	game::cvar_t* cg_drawHeadIcon;
 
-	utils::hook::detour CG_DrawWeaponSelect_hook;
-	utils::hook::detour CG_Obituary_hook;
+	utils::hook::detour hook_CG_DrawUpperRight;
+	utils::hook::detour hook_CG_DrawFPS;
 
-	static void CG_DrawDisconnect_stub()
+	static void draw_branding()
 	{
-		if (!cg_drawDisconnect->integer)
+		if (!branding->integer)
 			return;
-		utils::hook::invoke<void>(ABSOLUTE_CGAME_MP(0x30015450));
+
+		const auto x = 1;
+		const auto y = 10;
+		const auto fontID = 1;
+		const auto scale = 0.21f;
+		float color[4] = { 1.f, 1.f, 1.f, 0.50f };
+		float color_shadow[4] = { 0.f, 0.f, 0.f, 0.80f };
+		std::string text = std::string(MOD_NAME);
+
+		game::SCR_DrawString(x + 1, y + 1, fontID, scale, color_shadow, text.c_str(), NULL, NULL, NULL);
+		game::SCR_DrawString(x, y, fontID, scale, color, text.c_str(), NULL, NULL, NULL);
 	}
 
-	static void CG_DrawWeaponSelect_stub()
+	static void Draw_Speedometer()
 	{
-		if (!cg_drawWeaponSelect->integer)
-			return;
-		CG_DrawWeaponSelect_hook.invoke();
+		const auto x = 280;
+		const auto y = 420;
+		const auto fontID = 4;
+		const auto scale = 0.25f;
+		float color[4] = { 1.f, 1.f, 1.f, 1.0f };
+		float color_shadow[4] = { 0.f, 0.f, 0.f, 0.80f };
+		float velY = *game::cg_velocity_Y;
+		float velX = *game::cg_velocity_X;
+		float velZ = *game::cg_velocity_Z;
+
+		float speed = sqrtf(velX * velX + velY * velY);
+
+		if (cg_Speedometer->integer == 2)
+			speed = sqrtf(velX * velX + velY * velY + velZ * velZ);
+
+		std::string text = utils::string::va("Speed: %.2f", speed);
+
+		game::SCR_DrawString(x + 1, y + 1, fontID, scale, color_shadow, text.c_str(), NULL, NULL, NULL);
+		game::SCR_DrawString(x, y, fontID, scale, color, text.c_str(), NULL, NULL, NULL);
 	}
 
-	static void CG_Obituary_stub()
+	static void draw_ping()
 	{
-		if (!cg_Obituary->integer)
+		if (*game::clc_demoplaying)
 			return;
-		CG_Obituary_hook.invoke();
+
+		int* clSnap_ping = (int*)0x0143b148;
+		//int* clSnap_ping = (int*)0x01432978;
+
+		const auto background_x = 475;
+		const auto background_y = 0;
+		const auto background_width = 85;
+		const auto background_height = 15;
+		float background_color[4] = { 0, 0, 0, 0.6f };
+
+		(*game::cgame_mp::syscall)(game::CG_R_SETCOLOR, background_color);
+		auto shader = (game::qhandle_t)(*game::cgame_mp::syscall)(game::CG_R_REGISTERSHADERNOMIP, "black", 5);
+		game::CG_DrawPic(background_x, background_y, background_width, background_height, shader);
+		(*game::cgame_mp::syscall)(game::CG_R_SETCOLOR, NULL);
+
+		const auto fontID = 1;
+		const auto scale = 0.21f;
+		float text_color[4] = { 1, 1, 1, 1 };
+		std::string text = utils::string::va("Latency: %i ms", *clSnap_ping);
+		game::SCR_DrawString(background_x + 3, background_y + 11, fontID, scale, text_color, text.c_str(), NULL, NULL, NULL);
 	}
 
-	static void strncpy_filter_stub(char* dest, const char* src, int destsize)
+	static void CG_DrawUpperRight_Stub()
 	{
-		int i = 0, j = 0;
-		if (destsize <= 0)
-			return;
+		if (cg_Speedometer->integer)
+			Draw_Speedometer();
 
-		while (src[i] != '\0' && j < destsize - 1)
+		if (cg_drawPing->integer)
+			draw_ping();
+
+		hook_CG_DrawUpperRight.invoke();
+	}
+
+	static void CG_DrawFPS_Stub(float y)
+	{
+		if (!cg_drawFPS_custom->integer)
 		{
-			if (src[i] == '^')
+			hook_CG_DrawFPS.invoke(y);
+			return;
+		}
+
+		static int previousTimes[game::FPS_FRAMES];
+		static int index;
+		int i, total;
+		int fps;
+		static int previous;
+		int t, frameTime;
+
+		t = (int)(*game::cgame_mp::syscall)(game::CG_MILLISECONDS);
+		frameTime = t - previous;
+		previous = t;
+
+		previousTimes[index % game::FPS_FRAMES] = frameTime;
+		index++;
+		if (index > game::FPS_FRAMES)
+		{
+			total = 0;
+			for (i = 0; i < game::FPS_FRAMES; i++)
 			{
-				int caretStart = i;
-				while (src[i] == '^')
-				{
-					i++;
-				}
-				if (src[i] != '\0' && isdigit((unsigned char)src[i]))
-				{
-					while (src[i] != '\0' && isdigit((unsigned char)src[i]))
-					{
-						i++;
-					}
-					continue;
-				}
-				else
-				{
-					for (int k = caretStart; k < i && j < destsize - 1; k++)
-					{
-						dest[j++] = src[k];
-					}
-					continue;
-				}
+				total += previousTimes[i];
 			}
-			else
+			if (!total)
 			{
-				dest[j++] = src[i++];
+				total = 1;
 			}
-		}
-		dest[j] = '\0';
+			fps = 1000 * game::FPS_FRAMES / total;
 
+			const auto background_x = 570;
+			const auto background_y = 0;
+			const auto background_width = 50;
+			const auto background_height = 15;
+			float background_color[4] = { 0, 0, 0, 0.6f };
+
+			(*game::cgame_mp::syscall)(game::CG_R_SETCOLOR, background_color);
+			auto shader = (game::qhandle_t)(*game::cgame_mp::syscall)(game::CG_R_REGISTERSHADERNOMIP, "black", 5);
+			game::CG_DrawPic(background_x, background_y, background_width, background_height, shader);
+			(*game::cgame_mp::syscall)(game::CG_R_SETCOLOR, NULL);
+
+			const auto fontID = 1;
+			const auto scale = 0.21f;
+			float text_color[4] = { 1, 1, 1, 1 };
+			std::string text = utils::string::va("FPS: %i", fps);
+			game::SCR_DrawString(background_x + 3, background_y + 11, fontID, scale, text_color, text.c_str(), NULL, NULL, NULL);
+		}
 	}
-	static void CG_ObituaryColor_stub(char* dest, const char* src, int destsize)
+
+	void(*CG_PlayerSprites)();
+	void __cdecl CG_PlayerSprites_Stub()
 	{
-		if (!cg_ObituaryColor->integer)
+		int* c_ent;
+		__asm mov c_ent, eax
+
+		if (cg_drawHeadIcon->integer)
 		{
-			strncpy_filter_stub(dest, src, destsize);
-			dest[destsize - 1] = 0;
-		}
-		else
-		{
-			strncpy_s(dest, destsize, src, _TRUNCATE);
-			dest[destsize - 1] = 0;
+			__asm mov eax, c_ent
+			CG_PlayerSprites();
 		}
 	}
-
-	static void CG_WhiteText_rename_stub(int player_rename)
-	{
-		if (!cg_WhiteText->integer)
-			return;
-
-		utils::hook::invoke<void>(ABSOLUTE_CGAME_MP(0x3003eb40), player_rename);
-
-	}
-
-	static void __fastcall CG_WhiteText_stub(int message)
-	{
-		if (!cg_WhiteText->integer)
-			return;
-		utils::hook::invoke<void>(ABSOLUTE_CGAME_MP(0x300207b0), message);
-	}
-
-#if 0
-#define ping ((int*)0x0143b148)
-
-	void cg_draw_ping()
-	{
-		if (cg_drawPing->integer > 0 && *game::cls_state == game::CA_ACTIVE)
-		{
-			int font = 1;
-			auto* const ping_string = utils::string::va("Ping: %i", *ping);
-			const auto scale = 0.25f;
-			float ping_color[4] = { 1.0f, 1.0f, 1.0f, 0.65f };
-			int x = 200;
-			int y = 20;
-
-			game::SCR_DrawString(x, y, font, scale, ping_color, ping_string, NULL, NULL, NULL);
-		}
-	}
-#endif
-
-	void ready_hook_cgame_mp()
-	{
-		CG_DrawWeaponSelect_hook.create(ABSOLUTE_CGAME_MP(0x30037790), CG_DrawWeaponSelect_stub);
-		CG_Obituary_hook.create(ABSOLUTE_CGAME_MP(0x3001D6C0), CG_Obituary_stub);
-
-		utils::hook::jump(ABSOLUTE_CGAME_MP(0x300159CC), CG_DrawDisconnect_stub);
-		utils::hook::jump(ABSOLUTE_CGAME_MP(0x300159D4), CG_DrawDisconnect_stub);
-
-		utils::hook::call(ABSOLUTE_CGAME_MP(0x3002fd50), CG_WhiteText_rename_stub);
-		utils::hook::call(ABSOLUTE_CGAME_MP(0x3002e195), CG_WhiteText_stub);
-		utils::hook::jump(ABSOLUTE_CGAME_MP(0x30038006), CG_WhiteText_stub);
-
-		utils::hook::call(ABSOLUTE_CGAME_MP(0x3001d861), CG_ObituaryColor_stub);	// attacker name
-		utils::hook::call(ABSOLUTE_CGAME_MP(0x3001d8f6), CG_ObituaryColor_stub);	// victim name
-		utils::hook::call(ABSOLUTE_CGAME_MP(0x3001d951), CG_ObituaryColor_stub);
-	}
-
+	
 	class component final : public component_interface
 	{
 	public:
 		void post_unpack() override
 		{
-			branding = game::Cvar_Get("branding", "1", CVAR_ARCHIVE);
-			cg_drawFPS = game::Cvar_Get("cg_drawFPS", "0", CVAR_ARCHIVE);
-			cg_drawWeaponSelect = game::Cvar_Get("cg_drawWeaponSelect", "1", CVAR_ARCHIVE);
-			cg_drawDisconnect = game::Cvar_Get("cg_drawDisconnect", "1", CVAR_ARCHIVE);
-			cg_chatHeight = game::Cvar_Get("cg_chatHeight", "8", CVAR_ARCHIVE);
-			con_boldgamemessagetime = game::Cvar_Get("con_boldgamemessagetime", "8", CVAR_ARCHIVE);
-			cg_lagometer = game::Cvar_Get("cg_lagometer", "0", CVAR_ARCHIVE);
+			branding				= game::Cvar_Get("branding", "1", game::CVAR_ARCHIVE);
+			cg_Speedometer			= game::Cvar_Get("cg_Speedometer", "0", game::CVAR_ARCHIVE);
+			cg_drawFPS_custom		= game::Cvar_Get("cg_drawFPS_custom", "0", game::CVAR_ARCHIVE);
+			cg_drawPing				= game::Cvar_Get("cg_drawPing", "0", game::CVAR_ARCHIVE);
+			cg_drawHeadIcon			= game::Cvar_Get("cg_drawHeadIcon", "1", game::CVAR_ARCHIVE);
 
-			cg_Obituary = game::Cvar_Get("cg_Obituary", "1", CVAR_ARCHIVE);
-			cg_WhiteText = game::Cvar_Get("cg_WhiteText", "1", CVAR_ARCHIVE);
-			cg_ObituaryColor = game::Cvar_Get("cg_ObituaryColor", "1", CVAR_ARCHIVE);
-			
-			scheduler::loop([]()
-				{
-					if (!branding->integer)
-						return;
+			scheduler::loop(draw_branding, scheduler::pipeline::renderer);
 
-					const auto x = 1;
-					const auto y = 10;
-					const auto fontID = 1;
-					const auto scale = 0.21f;
-					float color[4] = { 1.f, 1.f, 1.f, 0.80f };
-					float color_shadow[4] = { 0.f, 0.f, 0.f, 0.80f };
-					const auto* text = MOD_NAME;
+			utils::hook::set(0x00416b82 + 1, "RECORDING %s: %iKB");
+		}
 
-					// Draw a drop shadow first
-					game::SCR_DrawString(x + 1, y + 1, fontID, scale, color_shadow, text, NULL, NULL, NULL);
-					game::SCR_DrawString(x, y, fontID, scale, color, text, NULL, NULL, NULL);
-
-				}, scheduler::renderer);
-
-
-
-
-
-
-			//cg_drawPing = game::Cvar_Get("cg_drawPing", "0", CVAR_ARCHIVE);
-			//scheduler::loop(cg_draw_ping, scheduler::pipeline::renderer);
+		void post_cgame() override
+		{
+			CG_PlayerSprites = (void(*)())ABSOLUTE_CGAME_MP(0x300274D0);
+			utils::hook::call(ABSOLUTE_CGAME_MP(0x300282DE), CG_PlayerSprites_Stub);
+			hook_CG_DrawUpperRight.create(ABSOLUTE_CGAME_MP(0x30015070), CG_DrawUpperRight_Stub);
+			hook_CG_DrawFPS.create(ABSOLUTE_CGAME_MP(0x30014a00), CG_DrawFPS_Stub);
 		}
 	};
 }
 
 REGISTER_COMPONENT(ui::component)
-#endif

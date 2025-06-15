@@ -1,19 +1,10 @@
 #include <std_include.hpp>
-#if 1
-#include <utils/hook.hpp>
 #include "loader/component_loader.hpp"
+
 #include "game/game.hpp"
+
+#include <utils/hook.hpp>
 #include <utils/string.hpp>
-
-/*
-=================
-
-This file is for additional video modes.
-
-TODO:
-fix issues with higher resolutions and scaling issues.
-=================
-*/
 
 namespace vidmode
 {
@@ -36,12 +27,11 @@ namespace vidmode
 		return false;
 	}
 
-
 	typedef struct vidmode_s
 	{
 		const char* description;
 		int width, height;
-		float pixelAspect;              // pixel width / height
+		float pixelAspect;
 	} vidmode_t;
 
 	vidmode_t r_vidModes[] =
@@ -60,7 +50,7 @@ namespace vidmode
 		{ "Mode 10: 2048x1536   (4:3)",    2048,    1536,    1 },
 		{ "Mode 11:   856x480  (16:9)",     856,     480,    1 },
 		{ "Mode 12: 1920x1200 (16:10)",	   1920,    1200,    1 },
-		// new modes taken from iortcw 
+		// additional modes taken from iortcw 
 		{ "Mode 13:   640x360  (16:9)",     640,     360,    1 },
 		{ "Mode 14:   640x400 (16:10)",     640,     400,    1 },
 		{ "Mode 15:   800x450  (16:9)",     800,     450,    1 },
@@ -82,7 +72,7 @@ namespace vidmode
 
 	static int s_numVidModes = (sizeof(r_vidModes) / sizeof(r_vidModes[0]));
 
-	boolean R_GetModeInfo_stub(int mode, int* height, float* windowAspect, int* width)
+	boolean R_GetModeInfo(int mode, int* height, float* windowAspect, int* width)
 	{
 		vidmode_t* vm;
 		float			pixelAspect;
@@ -90,7 +80,7 @@ namespace vidmode
 		width = game::vidWidth;
 		height = game::vidHeight;
 
-		//if mode doesn't exist use existing mode, having it set to false would cause a GL error.
+		//if mode doesn't exist use an existing mode, having it set to false would cause a openGL error.
 		if (mode < -1 || mode >= s_numVidModes + 1)
 			mode = 6;
 
@@ -106,9 +96,8 @@ namespace vidmode
 			GetDesktopResolution(width, height);
 
 			if (*height > *width)  // incase someone has their monitor in portrait mode
-			{
 				*height = (int)(*width / (4.0 / 3.0));
-			}
+
 			*windowAspect = (float)*width / *height;
 			return true;
 		}
@@ -124,7 +113,7 @@ namespace vidmode
 		return true;
 	}
 
-	void R_ModeList_f_stub()
+	void R_ModeList_f()
 	{
 		int i;
 		game::Com_Printf("\n");
@@ -132,7 +121,7 @@ namespace vidmode
 		{
 			game::Com_Printf("%s\n", r_vidModes[i].description);
 		}
-		// display these when players do modelist
+
 		game::Com_Printf("Mode 30: Automatic (Native)\n");
 		game::Com_Printf("Mode -1: Custom\n");
 	}
@@ -142,16 +131,14 @@ namespace vidmode
 	public:
 		void post_unpack() override
 		{
-			r_mode = game::Cvar_Get("r_mode", "3", CVAR_ARCHIVE | CVAR_LATCH);
-			r_customwidth = game::Cvar_Get("r_customwidth", "1600", CVAR_ARCHIVE | CVAR_LATCH);
-			r_customheight = game::Cvar_Get("r_customheight", "1024", CVAR_ARCHIVE | CVAR_LATCH);
-			r_customaspect = game::Cvar_Get("r_customaspect", "1", CVAR_ARCHIVE | CVAR_LATCH);
-
-			utils::hook::jump(0x4b0ec0, R_GetModeInfo_stub);
-			utils::hook::jump(0x4b0f30, R_ModeList_f_stub);
+			r_mode = game::Cvar_Get("r_mode", "3", game::CVAR_ARCHIVE | game::CVAR_LATCH);
+			r_customwidth = game::Cvar_Get("r_customwidth", "1600", game::CVAR_ARCHIVE | game::CVAR_LATCH);
+			r_customheight = game::Cvar_Get("r_customheight", "1024", game::CVAR_ARCHIVE | game::CVAR_LATCH);
+			r_customaspect = game::Cvar_Get("r_customaspect", "1", game::CVAR_ARCHIVE | game::CVAR_LATCH);
+			utils::hook::jump(0x4b0ec0, R_GetModeInfo);
+			utils::hook::jump(0x4b0f30, R_ModeList_f);
 		}
 	};
 }
 
 REGISTER_COMPONENT(vidmode::component)
-#endif

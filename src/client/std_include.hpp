@@ -1,44 +1,26 @@
 #pragma once
 
-/*
-Size determined using Ghidra
-IMAGE_NT_HEADERS32 > IMAGE_OPTIONAL_HEADER32
-SizeOfImage - SizeOfHeaders
-*/
-#define BINARY_PAYLOAD_SIZE 0x15C1000
-
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 
+// Windows
 #include <Windows.h>
-#include <shellapi.h>
-#include <ShlObj.h>
 #include <atlbase.h>
-#include <GL/gl.h>
+#include <dbghelp.h>
+#include <TlHelp32.h>
+#include <wincrypt.h>
 
-// min and max is required by gdi, therefore NOMINMAX won't work
-#ifdef max
-#undef max
-#endif
-
-#ifdef min
-#undef min
-#endif
-
-#define MOD_NAME "iw1x"
-
-#define MSG_BOX_INFO(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONINFORMATION);
-#define MSG_BOX_WARN(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONWARNING);
-#define MSG_BOX_ERROR(message) MessageBoxA(nullptr, message, MOD_NAME, MB_ICONERROR | MB_SETFOREGROUND | MB_TOPMOST);
-
-#include <cstring>
+// C++
+#include <cassert>
 #include <filesystem>
+#include <fstream>
 #include <mutex>
 #include <queue>
 #include <sstream>
 #include <string>
 
+// deps
 #include <gsl/gsl>
-
 #include <MinHook.h>
 #include <imgui.h>
 #include <backends/imgui_impl_opengl2.h>
@@ -47,5 +29,8 @@ SizeOfImage - SizeOfHeaders
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ntdll.lib")
 #pragma comment(lib, "opengl32.lib")
+
+#define BINARY_PAYLOAD_SIZE 0x1600000	// 1.1 exe is 0x15C2000
+#define MOD_NAME "iw1x"
 
 using namespace std::literals;

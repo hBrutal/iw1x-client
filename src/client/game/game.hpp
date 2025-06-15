@@ -11,7 +11,6 @@ constexpr auto BASE_UI_MP = 0x40000000;
 #define ABSOLUTE_CGAME_MP(relative) (address_cgame_mp + (relative - BASE_CGAME_MP))
 #define ABSOLUTE_UI_MP(relative)	(address_ui_mp + (relative - BASE_UI_MP))
 
-//#define SP_OR_MP(sp, mp) (game::environment::is_sp() ? (sp) : (mp))
 
 namespace game
 {
@@ -25,8 +24,7 @@ namespace game
 	class symbol
 	{
 	public:
-		symbol(const size_t sp_address, const size_t mp_address, const ptrdiff_t offset = 0) :
-			sp_object(reinterpret_cast<T*>(sp_address)),
+		symbol(const size_t mp_address, const ptrdiff_t offset = 0) :
 			mp_object(reinterpret_cast<T*>(mp_address)),
 			offset(offset)
 		{
@@ -34,7 +32,7 @@ namespace game
 
 		T* get() const
 		{
-			T* ptr = mp_object;//environment::is_sp() ? sp_object : mp_object;
+			T* ptr = mp_object;
 			uintptr_t base_address = 0;
 
 			switch (offset)
@@ -62,7 +60,6 @@ namespace game
 			return this->get();
 		}
 	private:
-		T* sp_object;
 		T* mp_object;
 		ptrdiff_t offset;
 	};

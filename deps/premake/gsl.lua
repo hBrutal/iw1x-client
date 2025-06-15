@@ -1,19 +1,19 @@
-gsl = {
+GSL = {
 	source = path.join(dependencies.basePath, "GSL")
 }
 
-function gsl.import()
-	gsl.includes()
+function GSL.import()
+	GSL.includes()
 end
 
-function gsl.includes()
+function GSL.includes()
 	includedirs {
-		path.join(gsl.source, "include")
+		path.join(GSL.source, "include")
 	}
 end
 
-function gsl.project()
+function GSL.project()
 
 end
 
-table.insert(dependencies, gsl)
+table.insert(dependencies, GSL)

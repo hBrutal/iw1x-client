@@ -62,6 +62,17 @@ void component_loader::post_unpack()
 	}
 }
 
+void component_loader::post_cgame()
+{
+	for (const auto& component_ : get_components())
+		component_->post_cgame();
+}
+void component_loader::post_ui_mp()
+{
+	for (const auto& component_ : get_components())
+		component_->post_ui_mp();
+}
+
 void component_loader::pre_destroy()
 {
 	static auto handled = false;

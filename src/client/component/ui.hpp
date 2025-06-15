@@ -1,16 +1,11 @@
 #pragma once
+#include "game/game.hpp"
 
 namespace ui
 {
-	extern game::cvar_t* cg_drawFPS;
-	extern game::cvar_t* cg_lagometer;
-	extern game::cvar_t* cg_drawDisconnect;
-	extern game::cvar_t* cg_drawWeaponSelect;
-	extern game::cvar_t* cg_chatHeight;
-	extern game::cvar_t* con_boldgamemessagetime;
-	extern game::cvar_t* cg_Obituary;
-	extern game::cvar_t* cg_WhiteText;
-	extern game::cvar_t* cg_ObituaryColor;
-
-	void ready_hook_cgame_mp();
+	extern game::cvar_t* branding;
+	extern game::cvar_t* cg_drawFPS_custom;
+	extern game::cvar_t* cg_drawPing;
+	extern game::cvar_t* cg_drawHeadIcon;
+	extern game::cvar_t* cg_Speedometer;
 }

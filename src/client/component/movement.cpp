@@ -1,8 +1,9 @@
 #include <std_include.hpp>
-#if 1
-#include <utils/hook.hpp>
 #include "loader/component_loader.hpp"
-#include "game/game.hpp"
+
+#include "movement.hpp"
+
+#include <utils/hook.hpp>
 
 namespace movement
 {
@@ -14,17 +15,20 @@ namespace movement
 	
 	static void Cmd_LookBack()
 	{
-		game::viewangles[YAW] += 180;
+		game::viewangles[game::YAW] += 180;
 	}
 	
-	static float originalCgZoomSensitivity()
+	static float originalCgZoomSensitivity() // See 30032fe8
 	{
-		return *game::fov_visible / *game::cg_fov_value; // See 30032fe8
+		return *game::fov_visible / cvars::vm::cg_fov->value; // See 30032fe8
 	}
 	
 	static float scaledCgZoomSensitivity()
 	{
 		bool weaponIsSniper = false;
+
+		if (!*game::pm)
+			return originalCgZoomSensitivity();
 		
 		int weapon = (*game::pm)->ps->weapon;
 		game::weaponInfo_t* weaponInfo = game::BG_GetInfoForWeapon(weapon);
@@ -66,7 +70,7 @@ namespace movement
 		}
 	}
 	
-	static __declspec(naked) void cg_zoomSensitivity_calculation_stub()
+	static __declspec(naked) void cg_zoomSensitivity_calculation_Stub()
 	{
 		__asm
 		{
@@ -76,11 +80,69 @@ namespace movement
 		}
 	}
 	
-	void ready_hook_cgame_mp()
+	static void projectVelocity(const float *in, const float *normal, float *out)
 	{
-		if (*game::clc_demoplaying != game::qtrue)
+		float lengthSq2D;
+		float adjusted;
+		float newZ;
+		float lengthScale;
+    
+		lengthSq2D = (float)(in[0] * in[0]) + (float)(in[1] * in[1]);
+
+		if (fabs(normal[2]) < 0.001 || lengthSq2D == 0.0)
 		{
-			utils::hook::jump(ABSOLUTE_CGAME_MP(0x30032fe8), cg_zoomSensitivity_calculation_stub);
+			out[0] = in[0];
+			out[1] = in[1];
+			out[2] = in[2];
+		}
+		else
+		{
+			newZ = (float)-(float)((float)(in[0] * normal[0]) + (float)(in[1] * normal[1])) / normal[2];
+			adjusted = in[1];
+			lengthScale = sqrt((float)((float)(in[2] * in[2]) + lengthSq2D) / (float)((float)(newZ * newZ) + lengthSq2D));
+
+			if (lengthScale < 1.0 || newZ < 0.0 || in[2] > 0.0)
+			{
+				out[0] = lengthScale * in[0];
+				out[1] = lengthScale * adjusted;
+				out[2] = lengthScale * newZ;
+			}
+		}
+	}
+	
+	static uint32_t projectOrClip(game::vec3_t in, game::vec3_t normal, game::vec3_t out, float overbounce)
+	{
+		char* cl_gameState_stringData = (char*)0x01436a7c;
+		int* cl_gameState_stringOffsets = (int*)0x1434A7C;
+		char* systemInfo = cl_gameState_stringData + cl_gameState_stringOffsets[game::CS_SYSTEMINFO];
+
+		/*std::stringstream ss;
+		ss << "####### in[0]: " << in[0] << std::endl;
+		ss << "####### normal[0]: " << normal[0] << std::endl;
+		ss << "####### out[0]: " << out[0] << std::endl;
+		ss << "####### overbounce: " << overbounce << std::endl;
+		OutputDebugString(ss.str().c_str());*/
+		
+		if (atoi(game::Info_ValueForKey(systemInfo, "jump_bounceEnable")))
+			projectVelocity(in, normal, out);
+		else
+			game::PM_ClipVelocity(in, normal, out, overbounce);
+		
+		return ABSOLUTE_CGAME_MP(0x3000D830);
+	}
+	
+	static __declspec(naked) void PM_StepSlideMove_PM_ClipVelocity_Stub()
+	{
+		__asm
+		{
+			push esi; // out
+			push ecx; // normal
+			push edx; // in
+			call projectOrClip;
+			add esp, 0xc;
+			
+			push eax;
+			retn;
 		}
 	}
 	
@@ -89,16 +151,20 @@ namespace movement
 	public:
 		void post_unpack() override
 		{
-			sensitivity_adsScaleEnable = game::Cvar_Get("sensitivity_adsScaleEnable", "0", CVAR_ARCHIVE);
-			sensitivity_adsScale = game::Cvar_Get("sensitivity_adsScale", "1", CVAR_ARCHIVE);
-			sensitivity_adsScaleSniperEnable = game::Cvar_Get("sensitivity_adsScaleSniperEnable", "0", CVAR_ARCHIVE);
-			sensitivity_adsScaleSniper = game::Cvar_Get("sensitivity_adsScaleSniper", "1", CVAR_ARCHIVE);
-			m_rawinput = game::Cvar_Get("m_rawinput", "0", CVAR_ARCHIVE);
-			
+			sensitivity_adsScaleEnable = game::Cvar_Get("sensitivity_adsScaleEnable", "0", game::CVAR_ARCHIVE);
+			sensitivity_adsScale = game::Cvar_Get("sensitivity_adsScale", "1", game::CVAR_ARCHIVE);
+			sensitivity_adsScaleSniperEnable = game::Cvar_Get("sensitivity_adsScaleSniperEnable", "0", game::CVAR_ARCHIVE);
+			sensitivity_adsScaleSniper = game::Cvar_Get("sensitivity_adsScaleSniper", "1", game::CVAR_ARCHIVE);
+			m_rawinput = game::Cvar_Get("m_rawinput", "0", game::CVAR_ARCHIVE);
 			game::Cmd_AddCommand("lookback", Cmd_LookBack);
+		}
+
+		void post_cgame() override
+		{
+			utils::hook::jump(ABSOLUTE_CGAME_MP(0x30032fe8), cg_zoomSensitivity_calculation_Stub);
+			utils::hook::jump(ABSOLUTE_CGAME_MP(0x3000d82b), PM_StepSlideMove_PM_ClipVelocity_Stub);
 		}
 	};
 }
 
 REGISTER_COMPONENT(movement::component)
-#endif
