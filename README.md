@@ -2,12 +2,6 @@
 
 **IW1x** is a modification for Call of Duty Multiplayer v1.1, focused on expanding functionality, improving security, and enhancing quality-of-life features.
 
-
-## Installation
-1. Download the latest release from the [Releases](https://github.com/hbrutal/iw1x-client/releases) page.  
-2. Place the downloaded `Iw1x.exe` file in the root directory of your *Call of Duty* installation.  
-3. Launch `Iw1x.exe` to start the game.
-
 ## Compile from source
 
 - Clone the Git repo. Do NOT download it as ZIP, that won't work.
